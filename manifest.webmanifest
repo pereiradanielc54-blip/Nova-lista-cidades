@@ -1,0 +1,17 @@
+{
+  "name": "União Transportes — Consulta de Filiais",
+  "short_name": "Filiais",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071b32",
+  "theme_color": "#071b32",
+  "description": "Consulte qual filial atende cada cidade.",
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
