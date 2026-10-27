@@ -19,6 +19,7 @@ async function refreshAccess(){
  if(currentUser&&!isEditor)$('authForm').classList.add('hidden');
 }
 async function loadSharedRecords(){
+ if(!supabase){render();return}
  const {data,error}=await supabase.from('city_directory').select('records').eq('id',1).maybeSingle();
  if(error){$('authMessage').textContent='Não foi possível carregar os dados compartilhados. Verifique a conexão e as permissões do banco.';return}
  if(data&&Array.isArray(data.records)){records=data.records;remoteReady=true;localStorage.setItem(KEY,JSON.stringify(records));}
@@ -26,7 +27,7 @@ async function loadSharedRecords(){
 }
 $('authForm').onsubmit=async e=>{e.preventDefault();if(!supabase){$('authMessage').textContent='Serviço de login indisponível. Verifique a conexão e recarregue a página.';return}const email=$('authEmail').value.trim(),password=$('authPassword').value;$('authSubmit').disabled=true;$('authSubmit').textContent='Entrando…';const {error}=await supabase.auth.signInWithPassword({email,password});$('authSubmit').disabled=false;if(error){$('authMessage').textContent='Falha no login: '+error.message;return}$('authPassword').value='';await refreshAccess();await loadSharedRecords();if(isEditor){$('authMessage').textContent='Acesso autorizado. Os dados são sincronizados com o banco compartilhado.'}};
 $('authLogout').onclick=async()=>{await supabase.auth.signOut();await refreshAccess();};
-supabase.auth.onAuthStateChange(()=>{setTimeout(async()=>{await refreshAccess();},0)});
+if(supabase)supabase.auth.onAuthStateChange(()=>{setTimeout(async()=>{await refreshAccess();},0)});
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 (async()=>{await refreshAccess();await loadSharedRecords();render()})();
 </script></body></html>
