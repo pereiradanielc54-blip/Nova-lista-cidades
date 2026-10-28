@@ -1,4 +1,4 @@
-const CACHE='uniao-filiais-v6';
+const CACHE='uniao-filiais-v7';
 const FILES=['./','./index.html','./manifest.webmanifest','./assets/icon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('uniao-filiais-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
