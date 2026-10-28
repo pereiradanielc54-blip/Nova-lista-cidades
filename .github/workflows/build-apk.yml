@@ -86,7 +86,7 @@ jobs:
 
           public class MainActivity extends Activity {
               private WebView webView;
-              private static final String HOME = "https://nova-lista-cidades.vercel.app";
+              private static final String HOME = "https://lista-cidades.vercel.app";
               @Override public void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
                   getWindow().setStatusBarColor(Color.rgb(15, 23, 42));
@@ -105,7 +105,7 @@ jobs:
                       @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                           Uri uri = request.getUrl();
                           String host = uri.getHost();
-                          if (host != null && (host.equals("nova-lista-cidades.vercel.app") || host.endsWith(".supabase.co") || host.endsWith(".vercel.app"))) return false;
+                          if (host != null && (host.equals("lista-cidades.vercel.app") || host.equals("nova-lista-cidades.vercel.app") || host.endsWith(".supabase.co") || host.endsWith(".vercel.app"))) return false;
                           if ("https".equals(uri.getScheme())) {
                               startActivity(new Intent(Intent.ACTION_VIEW, uri));
                               return true;
