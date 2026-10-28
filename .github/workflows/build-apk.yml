@@ -19,6 +19,11 @@ jobs:
           java-version: "17"
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          accept-android-sdk-licenses: true
+      - name: Install Android build packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate Android WebView wrapper
@@ -53,15 +58,8 @@ jobs:
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
-              <application
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
-                  android:label="Consulta de Filiais"
-                  android:usesCleartextTraffic="false"
-                  android:allowBackup="false">
-                  <activity
-                      android:name=".MainActivity"
-                      android:configChanges="orientation|screenSize|keyboardHidden"
-                      android:exported="true">
+              <application android:theme="@android:style/Theme.Material.Light.NoActionBar" android:label="Consulta de Filiais" android:usesCleartextTraffic="false" android:allowBackup="false">
+                  <activity android:name=".MainActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:exported="true">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
@@ -79,8 +77,6 @@ jobs:
           import android.webkit.WebResourceRequest;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import android.view.View;
-          import android.view.WindowManager;
           import android.graphics.Color;
           import android.content.Intent;
           import android.net.Uri;
@@ -92,7 +88,6 @@ jobs:
                   super.onCreate(savedInstanceState);
                   getWindow().setStatusBarColor(Color.rgb(15, 23, 42));
                   getWindow().setNavigationBarColor(Color.rgb(15, 23, 42));
-                  getWindow().getDecorView().setSystemUiVisibility(0);
                   webView = new WebView(this);
                   webView.setBackgroundColor(Color.WHITE);
                   webView.getSettings().setJavaScriptEnabled(true);
@@ -107,7 +102,7 @@ jobs:
                       @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                           Uri uri = request.getUrl();
                           String host = uri.getHost();
-                          if (host != null && (host.equals("nova-lista-cidades.vercel.app") || host.endsWith(".supabase.co"))) return false;
+                          if (host != null && (host.equals("nova-lista-cidades.vercel.app") || host.endsWith(".supabase.co") || host.endsWith(".vercel.app"))) return false;
                           if ("https".equals(uri.getScheme())) {
                               startActivity(new Intent(Intent.ACTION_VIEW, uri));
                               return true;
