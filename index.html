@@ -114,7 +114,7 @@ window.__loginHandler=async e=>{
  }finally{$('authSubmit').disabled=false;$('authSubmit').textContent='Entrar'}
 }
 $('authLogout').onclick=async()=>{try{if(supabase)await supabase.auth.signOut();await refreshAccess()}catch(err){$('authMessage').textContent='Erro ao sair: '+(err?.message||'tente novamente.')}};
-if(supabase)supabase.auth.onAuthStateChange((event,session)=>{setTimeout(async()=>{const result=await refreshAccess();if(result.ok&&result.isEditor&&session)await loadSharedRecords();if(event==='SIGNED_OUT'){$('authPassword').value='';$('authMessage').textContent='Você saiu da conta.'}},0)});
+if(supabase)supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){setTimeout(async()=>{currentUser=null;isEditor=false;remoteReady=false;$('authPassword').value='';$('authForm').classList.remove('hidden');$('authLogout').classList.add('hidden');$('adminWorkspace').classList.add('hidden');$('authStatus').textContent='Acesso administrativo';$('authMessage').textContent='Você saiu da conta.';render()},0)}});
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 (async()=>{await refreshAccess();await loadSharedRecords();render()})();
 </script></body></html>
