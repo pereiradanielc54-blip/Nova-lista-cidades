@@ -1,0 +1,140 @@
+name: Build APK Android
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-apk.yml"
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Generate Android WebView wrapper
+        shell: bash
+        run: |
+          mkdir -p app/src/main/java/br/com/uniontransportes/filiais
+          cat > settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
+          rootProject.name = "UniaoFiliais"
+          include(":app")
+          EOF
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.7.3' apply false
+          }
+          EOF
+          cat > app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'br.com.uniontransportes.filiais'
+              compileSdk 35
+              defaultConfig {
+                  applicationId 'br.com.uniontransportes.filiais'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName '1.0.0'
+              }
+          }
+          EOF
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <application
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
+                  android:label="Consulta de Filiais"
+                  android:usesCleartextTraffic="false"
+                  android:allowBackup="false">
+                  <activity
+                      android:name=".MainActivity"
+                      android:configChanges="orientation|screenSize|keyboardHidden"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+          cat > app/src/main/java/br/com/uniontransportes/filiais/MainActivity.java <<'EOF'
+          package br.com.uniontransportes.filiais;
+
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.webkit.WebChromeClient;
+          import android.webkit.WebResourceRequest;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import android.view.View;
+          import android.view.WindowManager;
+          import android.graphics.Color;
+          import android.content.Intent;
+          import android.net.Uri;
+
+          public class MainActivity extends Activity {
+              private WebView webView;
+              private static final String HOME = "https://nova-lista-cidades.vercel.app";
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  getWindow().setStatusBarColor(Color.rgb(15, 23, 42));
+                  getWindow().setNavigationBarColor(Color.rgb(15, 23, 42));
+                  getWindow().getDecorView().setSystemUiVisibility(0);
+                  webView = new WebView(this);
+                  webView.setBackgroundColor(Color.WHITE);
+                  webView.getSettings().setJavaScriptEnabled(true);
+                  webView.getSettings().setDomStorageEnabled(true);
+                  webView.getSettings().setDatabaseEnabled(true);
+                  webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                  webView.getSettings().setSupportMultipleWindows(false);
+                  webView.getSettings().setLoadsImagesAutomatically(true);
+                  webView.getSettings().setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+                  webView.setWebChromeClient(new WebChromeClient());
+                  webView.setWebViewClient(new WebViewClient() {
+                      @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                          Uri uri = request.getUrl();
+                          String host = uri.getHost();
+                          if (host != null && (host.equals("nova-lista-cidades.vercel.app") || host.endsWith(".supabase.co"))) return false;
+                          if ("https".equals(uri.getScheme())) {
+                              startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                              return true;
+                          }
+                          return false;
+                      }
+                  });
+                  setContentView(webView);
+                  if (savedInstanceState != null) webView.restoreState(savedInstanceState);
+                  else webView.loadUrl(HOME);
+              }
+              @Override protected void onSaveInstanceState(Bundle outState) {
+                  super.onSaveInstanceState(outState);
+                  webView.saveState(outState);
+              }
+              @Override public void onBackPressed() {
+                  if (webView != null && webView.canGoBack()) webView.goBack();
+                  else super.onBackPressed();
+              }
+          }
+          EOF
+      - name: Build APK
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: consulta-de-filiais-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
