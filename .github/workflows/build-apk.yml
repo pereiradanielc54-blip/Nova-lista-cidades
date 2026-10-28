@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - ".github/workflows/build-apk.yml"
+      - "index.html"
+      - "sw.js"
 permissions:
   contents: read
 jobs:
