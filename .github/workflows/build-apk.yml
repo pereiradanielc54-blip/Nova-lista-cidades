@@ -6,6 +6,7 @@ on:
       - ".github/workflows/build-apk.yml"
       - "index.html"
       - "sw.js"
+      - "public/uniao-fundo-apk.webp"
 permissions:
   contents: read
 jobs:
