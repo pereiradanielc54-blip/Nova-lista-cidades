@@ -1,5 +1,5 @@
 {
-  "name": "União Transportes — Consulta de Filiais",
+  "name": "União Transportes — Painel de Filiais",
   "short_name": "Filiais",
   "start_url": "./",
   "display": "standalone",
@@ -13,5 +13,10 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "scope": "./"
 }
