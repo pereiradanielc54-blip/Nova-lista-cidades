@@ -1,28 +1,20 @@
 {
+  "id": "/",
   "name": "União Transportes — Painel de Filiais",
   "short_name": "Filiais",
-  "start_url": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#071b32",
   "theme_color": "#071b32",
   "description": "Consulte qual filial atende cada cidade.",
   "icons": [
     {
-      "src": "./assets/icon.svg",
-      "sizes": "192x192",
+      "src": "/assets/icon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "./assets/icon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
     }
   ],
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
-  "scope": "./"
+  "display_override": ["standalone", "minimal-ui"]
 }
