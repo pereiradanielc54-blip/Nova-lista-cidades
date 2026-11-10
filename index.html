@@ -139,6 +139,23 @@ body.apk-webview .field select{
  body.apk-webview:before{background-size:cover!important;background-position:center center!important}
  body.apk-webview header,body.apk-webview main{position:relative}
 }
+
+/* Calculadora de prazo de entrega */
+.deadline-calculator{display:grid;gap:9px;margin:10px 0 14px}
+.deadline-calc-button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border:1px solid #55cfff70;border-radius:12px;background:linear-gradient(110deg,#0c4775,#126c83);color:#effaff;font-weight:750;box-shadow:0 7px 20px #0002}
+.deadline-calc-button:hover{filter:brightness(1.12)}
+.deadline-calc-panel{padding:14px;border:1px solid #55cfff55;border-radius:14px;background:rgba(4,20,41,.78);box-shadow:inset 0 1px #ffffff10}
+.deadline-calc-panel label{display:block;margin-bottom:8px;color:#d9edff;font-size:13px;font-weight:700}
+.deadline-date-input{width:100%;min-height:44px;padding:10px 12px;border:1px solid #477197;border-radius:10px;background:#041329;color:#fff;font:inherit;color-scheme:dark}
+.deadline-help{display:block;margin-top:8px;color:#a9c3dc;font-size:11px;line-height:1.5}
+.deadline-summary{margin-top:12px;padding:12px;border:1px solid #397ba0;border-radius:11px;background:rgba(12,48,76,.58);line-height:1.5}
+.deadline-summary strong{display:block;color:#75dcff;font-size:12px;letter-spacing:.04em}
+.deadline-date-result{display:block;margin:3px 0 2px;color:#fff;font-size:22px;font-weight:850}
+.deadline-summary p{margin:5px 0 0;color:#c5d9ec;font-size:12px}
+.deadline-holidays{margin:8px 0 0;padding:9px 10px;border-left:3px solid #e2b65b;border-radius:6px;background:rgba(94,66,20,.24);color:#ffe4a8;font-size:12px;line-height:1.55}
+.deadline-holidays ul{margin:5px 0 0;padding-left:18px}
+@media(max-width:430px){.deadline-calc-panel{padding:12px}.deadline-date-result{font-size:20px}}
+
 </style><style>/* Consulta pública: painel administrativo fica no projeto separado. */#openSettings,#settingsPanel{display:none!important}</style>
 <style>
 .map-toolbar{display:flex;justify-content:stretch;margin:14px 0 4px}
@@ -224,22 +241,6 @@ $('citySearch').addEventListener('input',render);$('cityName').addEventListener(
 // A leitura é pública; a escrita é autorizada pelo RLS do banco.
 async function loadSharedRecords(){remoteReady=false;try{const rows=await dbRequest("city_directory?id=eq.1&select=id,records");const data=Array.isArray(rows)?rows[0]:null;if(!data)throw new Error("Registro principal id=1 não encontrado ou não visível.");if(!Array.isArray(data.records)||!data.records.every(r=>r&&typeof r==="object"&&typeof r.id==="string"&&typeof r.name==="string"&&Array.isArray(r.cities)&&r.cities.every(c=>typeof c==="string")))throw new Error("Os dados remotos têm formato inválido.");records=data.records;confirmedRecords=cloneRecords(records);remoteReady=true;$("syncStatus").textContent="Conectado ao Supabase. Dados compartilhados entre dispositivos.";render();return {ok:true,count:records.length}}catch(error){remoteReady=false;$("syncStatus").textContent="Falha ao carregar do Supabase: "+(error?.message||"erro desconhecido")+". Edição bloqueada até a conexão voltar.";console.error(error);render();return {ok:false,error}}}
 
-
-/* Calculadora de prazo de entrega */
-.deadline-calculator{display:grid;gap:9px;margin:10px 0 14px}
-.deadline-calc-button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border:1px solid #55cfff70;border-radius:12px;background:linear-gradient(110deg,#0c4775,#126c83);color:#effaff;font-weight:750;box-shadow:0 7px 20px #0002}
-.deadline-calc-button:hover{filter:brightness(1.12)}
-.deadline-calc-panel{padding:14px;border:1px solid #55cfff55;border-radius:14px;background:rgba(4,20,41,.78);box-shadow:inset 0 1px #ffffff10}
-.deadline-calc-panel label{display:block;margin-bottom:8px;color:#d9edff;font-size:13px;font-weight:700}
-.deadline-date-input{width:100%;min-height:44px;padding:10px 12px;border:1px solid #477197;border-radius:10px;background:#041329;color:#fff;font:inherit;color-scheme:dark}
-.deadline-help{display:block;margin-top:8px;color:#a9c3dc;font-size:11px;line-height:1.5}
-.deadline-summary{margin-top:12px;padding:12px;border:1px solid #397ba0;border-radius:11px;background:rgba(12,48,76,.58);line-height:1.5}
-.deadline-summary strong{display:block;color:#75dcff;font-size:12px;letter-spacing:.04em}
-.deadline-date-result{display:block;margin:3px 0 2px;color:#fff;font-size:22px;font-weight:850}
-.deadline-summary p{margin:5px 0 0;color:#c5d9ec;font-size:12px}
-.deadline-holidays{margin:8px 0 0;padding:9px 10px;border-left:3px solid #e2b65b;border-radius:6px;background:rgba(94,66,20,.24);color:#ffe4a8;font-size:12px;line-height:1.55}
-.deadline-holidays ul{margin:5px 0 0;padding-left:18px}
-@media(max-width:430px){.deadline-calc-panel{padding:12px}.deadline-date-result{font-size:20px}}
 
 /* Mapa regional da União — preencher BRANCH_POINTS com os endereços oficiais recebidos. */
 const BRANCH_POINTS = [
