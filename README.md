@@ -29,6 +29,14 @@ npm run dev
 ## Publicação no Vercel
 Conecte este repositório a um projeto Vercel e configure a raiz do projeto como a raiz do repositório. O comando de build é `npm run build`; a saída é `dist`. Esta aplicação não depende do GitHub Pages.
 
+## Cadastro de usuários administrativos
+
+A aba **Usuários** cria contas no Supabase Auth e concede acesso ao painel pela tabela `city_directory_editors`. A criação é feita por uma função de servidor em `api/admin/users.js`; a chave privilegiada nunca deve ser enviada ao navegador nem versionada no Git.
+
+Antes de usar o cadastro, configure na Vercel a variável de ambiente **`SUPABASE_SECRET_KEY`** com a chave secreta do projeto Supabase (Settings → API Keys → Secret keys). Não use o prefixo `NEXT_PUBLIC_` e não coloque essa chave em arquivos do repositório. Habilite a variável para Production e faça um novo deploy. A função valida o token do administrador e exige que ele já esteja cadastrado em `city_directory_editors`.
+
+Novas contas são confirmadas automaticamente e recebem acesso de edição igual ao dos usuários já autorizados. A senha inicial é definida no momento do cadastro.
+
 ## Configuração do Supabase
 Confira se as tabelas `city_directory` e `city_directory_editors` existem, se o registro `id = 1` está inicializado e se as políticas RLS permitem leitura conforme a necessidade do negócio, mas somente atualização por usuários autenticados cadastrados em `city_directory_editors`. Teste também o comportamento de usuário não autorizado.
 
