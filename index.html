@@ -242,12 +242,20 @@ $('citySearch').addEventListener('input',render);$('cityName').addEventListener(
 async function loadSharedRecords(){remoteReady=false;try{const rows=await dbRequest("city_directory?id=eq.1&select=id,records");const data=Array.isArray(rows)?rows[0]:null;if(!data)throw new Error("Registro principal id=1 não encontrado ou não visível.");if(!Array.isArray(data.records)||!data.records.every(r=>r&&typeof r==="object"&&typeof r.id==="string"&&typeof r.name==="string"&&Array.isArray(r.cities)&&r.cities.every(c=>typeof c==="string")))throw new Error("Os dados remotos têm formato inválido.");records=data.records;confirmedRecords=cloneRecords(records);remoteReady=true;$("syncStatus").textContent="Conectado ao Supabase. Dados compartilhados entre dispositivos.";render();return {ok:true,count:records.length}}catch(error){remoteReady=false;$("syncStatus").textContent="Falha ao carregar do Supabase: "+(error?.message||"erro desconhecido")+". Edição bloqueada até a conexão voltar.";console.error(error);render();return {ok:false,error}}}
 
 
+
+/* Marcador especial da filial de Goiânia */
+.branch-current-marker{background:transparent;border:0}
+.branch-current-marker .current-pin{position:relative;width:24px;height:24px;border-radius:50%;background:#ef3038;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,48,56,.22),0 2px 12px rgba(0,0,0,.5)}
+.branch-current-marker .current-pin:after{content:"";position:absolute;inset:-8px;border:2px solid rgba(239,48,56,.55);border-radius:50%;animation:currentPinPulse 1.8s ease-out infinite}
+@keyframes currentPinPulse{0%{transform:scale(.65);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+
 /* Mapa regional da União — preencher BRANCH_POINTS com os endereços oficiais recebidos. */
 const BRANCH_POINTS = [
   {name:'Matriz – União Transportes Marabá',city:'Marabá – PA',lat:-5.349539,lng:-49.099293},
   {name:'Filial – São Luís',city:'São Luís – MA',lat:-2.568323,lng:-44.228842},
   {name:'Filial – Bacabal',city:'Bacabal – MA',lat:-4.239945,lng:-44.790766},
-  {name:'Filial – Belém',city:'Belém – PA',lat:-1.372097,lng:-48.283699}
+  {name:'Filial – Belém',city:'Belém – PA',lat:-1.372097,lng:-48.283699},
+  {name:'Estamos aqui – Filial Goiânia',city:'Goiânia – GO',lat:-16.624588,lng:-49.250002,current:true}
 ];
 const MAP_INITIAL_BOUNDS = [[-25.8,-62.2],[1.6,-43.0]];
 let branchesMapInstance = null;
