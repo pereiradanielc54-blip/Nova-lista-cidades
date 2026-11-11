@@ -31,11 +31,13 @@ Conecte este repositório a um projeto Vercel e configure a raiz do projeto como
 
 ## Cadastro de usuários administrativos
 
-A aba **Usuários** cria contas no Supabase Auth e concede acesso ao painel pela tabela `city_directory_editors`. A criação é feita por uma função de servidor em `api/admin/users.js`; a chave privilegiada nunca deve ser enviada ao navegador nem versionada no Git.
+A aba **Usuários** cria contas no Supabase Auth pela função de servidor `api/admin/users.js`. Somente quem está em `city_directory_admins` pode criar contas. Os novos usuários entram em `city_directory_editors`, mas NÃO em `city_directory_admins`.
 
-Antes de usar o cadastro, configure na Vercel a variável de ambiente **`SUPABASE_SECRET_KEY`** com a chave secreta do projeto Supabase (Settings → API Keys → Secret keys). Não use o prefixo `NEXT_PUBLIC_` e não coloque essa chave em arquivos do repositório. Habilite a variável para Production e faça um novo deploy. A função valida o token do administrador e exige que ele já esteja cadastrado em `city_directory_editors`.
+O administrador principal pode cadastrar e alterar filiais, cadastrar/alterar cidades e criar usuários. Os usuários criados por ele podem apenas cadastrar/alterar cidades. A aba de filiais e a aba de usuários ficam ocultas para esses usuários. Um trigger no banco também bloqueia alterações de nomes, inclusão ou remoção de filiais por usuários comuns, mesmo que tentem chamar a API diretamente.
 
-Novas contas são confirmadas automaticamente e recebem acesso de edição igual ao dos usuários já autorizados. A senha inicial é definida no momento do cadastro.
+**Migração obrigatória:** aplique `supabase/migrations/20261111_admin_city_editor_roles.sql` no SQL Editor do Supabase antes de usar o novo controle de permissões. Ela cria a tabela de administradores, promove os usuários atualmente autorizados (para preservar o acesso administrativo já existente) e instala a proteção no banco. Usuários cadastrados depois da migração recebem apenas permissão de edição de cidades.
+
+Antes de usar o cadastro, configure na Vercel a variável de ambiente **`SUPABASE_SECRET_KEY`** com a chave secreta do projeto Supabase (Settings → API Keys → Secret keys). Não use o prefixo `NEXT_PUBLIC_` e não coloque essa chave em arquivos do repositório. Habilite a variável para Production e Preview e faça um novo deploy.
 
 ## Configuração do Supabase
 Confira se as tabelas `city_directory` e `city_directory_editors` existem, se o registro `id = 1` está inicializado e se as políticas RLS permitem leitura conforme a necessidade do negócio, mas somente atualização por usuários autenticados cadastrados em `city_directory_editors`. Teste também o comportamento de usuário não autorizado.
