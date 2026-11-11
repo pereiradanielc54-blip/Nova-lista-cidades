@@ -60,19 +60,19 @@ export default async function handler(req, res) {
       return send(res, 401, { error: "Sua sessão expirou. Entre novamente." });
     }
 
-    // Somente quem já está autorizado no painel pode criar outro acesso.
-    const { data: editor, error: editorError } = await supabaseAdmin
-      .from("city_directory_editors")
+    // Somente administradores principais podem criar contas.
+    const { data: adminUser, error: adminError } = await supabaseAdmin
+      .from("city_directory_admins")
       .select("user_id")
       .eq("user_id", authData.user.id)
       .maybeSingle();
 
-    if (editorError) {
-      console.error("Falha ao validar permissão de cadastro:", editorError.message);
-      return send(res, 503, { error: "Não foi possível validar sua autorização." });
+    if (adminError) {
+      console.error("Falha ao validar permissão de administrador:", adminError.message);
+      return send(res, 503, { error: "As permissões ainda não foram configuradas. Aplique a migração de funções do painel." });
     }
-    if (!editor) {
-      return send(res, 403, { error: "Você não tem permissão para cadastrar usuários." });
+    if (!adminUser) {
+      return send(res, 403, { error: "Somente o administrador principal pode cadastrar novos usuários." });
     }
 
     const { data: createdData, error: createError } =
