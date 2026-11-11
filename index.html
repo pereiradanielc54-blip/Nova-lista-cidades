@@ -299,15 +299,23 @@ let branchesCoverageLayer=null;
 
 function compactMapName(value){return norm(value).replace(/[^a-z0-9]/g,'')}
 function branchTownFromPoint(point){return String(point.city||'').replace(/\s*[–—-]\s*[A-Z]{2}\s*$/,'').trim()}
+function branchNameForMatch(value){
+  return compactMapName(String(value||'')
+    .replace(/\s*[–—-]\s*[A-Z]{2}\s*$/,'')
+    .replace(/^\s*\d{1,4}\s*[-–—.:]?\s*/,'')
+    .replace(/^\s*(?:filial|matriz)\s*[-–—.:]?\s*/i,'')
+    .replace(/^\s*uni[aã]o\s+transportes?\s*/i,''));
+}
 function findRecordForMapPoint(point){
   const town=compactMapName(branchTownFromPoint(point));
   if(!town||!Array.isArray(records))return null;
   const candidates=records.map(record=>{
-    const name=compactMapName(record.name);
+    const name=branchNameForMatch(record.name);
     let score=0;
-    if(name===town)score=100;
-    else if(name.includes(town))score=90;
-    else if(town.includes(name)&&name.length>=4)score=75;
+    if(name===town)score=120;
+    else if(name.startsWith(town))score=95;
+    else if(name.includes(town))score=85;
+    else if(town.includes(name)&&name.length>=4)score=70;
     return {record,score};
   }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score);
   if(!candidates.length||candidates.length>1&&candidates[0].score===candidates[1].score)return null;
@@ -388,8 +396,16 @@ async function showBranchCoverage(point,marker){
     try{
       const stateFeatures=await getMunicipalityMesh(uf);
       stateFeatures.forEach(feature=>{
-        const code=String(feature.id??feature.properties?.id??feature.properties?.CD_MUN??'');
-        if(codes.has(code))features.push(feature);
+        const props=feature.properties||{};
+        const featureCodes=[
+          props.codarea,
+          props.CD_GEOCMU,
+          props.cd_geocmu,
+          props.codigo,
+          props.id,
+          feature.id
+        ].filter(value=>value!==undefined&&value!==null).map(value=>String(value).trim());
+        if(featureCodes.some(code=>codes.has(code)))features.push(feature);
       });
     }catch(error){
       failedUfs.push(uf);
