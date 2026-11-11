@@ -58,7 +58,7 @@ begin
     ), '[]'::jsonb
   )
   into old_branches
-  from jsonb_array_elements(coalesce(old.records, '[]'::jsonb)) as item;
+  from jsonb_array_elements(coalesce(old.records, '[]'::jsonb)) as entries(item);
 
   select coalesce(
     jsonb_agg(
@@ -67,7 +67,7 @@ begin
     ), '[]'::jsonb
   )
   into new_branches
-  from jsonb_array_elements(coalesce(new.records, '[]'::jsonb)) as item;
+  from jsonb_array_elements(coalesce(new.records, '[]'::jsonb)) as entries(item);
 
   if old_branches is distinct from new_branches then
     raise exception 'Only administrators can create, edit, or remove branches';
