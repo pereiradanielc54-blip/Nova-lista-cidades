@@ -407,6 +407,10 @@ function loadLeafletLibrary(){
 const IBGE_MALHAS='https://servicodados.ibge.gov.br/api/v3/malhas';
 const municipalityBoundaryCache=new Map();
 let branchesCoverageLayer=null;
+let activeCoveragePoint=null;
+let activeCoverageMarker=null;
+let registryPollTimer=null;
+let registryPollBusy=false;
 
 function compactMapName(value){return norm(value).replace(/[^a-z0-9]/g,'')}
 function branchTownFromPoint(point){return String(point.city||'').replace(/\s*[–—-]\s*[A-Z]{2}\s*$/,'').trim()}
@@ -480,6 +484,8 @@ function drawBranchCoverageFeatures(features,marker){
 }
 
 async function showBranchCoverage(point,marker){
+  activeCoveragePoint=point;
+  activeCoverageMarker=marker;
   const status=$('branchesMapStatus');
   clearBranchCoverage();
   marker.openPopup();
@@ -670,6 +676,36 @@ closeBranchesMap.addEventListener('click',()=>{
   openBranchesMap.innerHTML='<span aria-hidden="true">📍</span> Mapa das filiais';
 });
 
+async function checkCityRegistryForChanges(){
+  if(registryPollBusy||!remoteReady||document.visibilityState==='hidden')return;
+  registryPollBusy=true;
+  try{
+    const rows=await dbRequest('city_directory?id=eq.1&select=id,records');
+    const data=Array.isArray(rows)?rows[0]:null;
+    if(!data||!Array.isArray(data.records))return;
+    if(JSON.stringify(data.records)!==JSON.stringify(records)){
+      records=data.records;
+      confirmedRecords=cloneRecords(records);
+      render();
+      if(activeCoveragePoint&&activeCoverageMarker&&!$('branchesMapPanel').classList.contains('hidden')){
+        await showBranchCoverage(activeCoveragePoint,activeCoverageMarker);
+      }
+      $('syncStatus').textContent='Cadastro de cidades atualizado automaticamente. As áreas atendidas serão recalculadas ao selecionar a filial.';
+    }
+  }catch(error){
+    console.warn('Falha ao verificar atualizações do cadastro de cidades.',error);
+  }finally{
+    registryPollBusy=false;
+  }
+}
+function startCityRegistryWatcher(){
+  if(registryPollTimer)return;
+  registryPollTimer=setInterval(checkCityRegistryForChanges,60000);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')checkCityRegistryForChanges();
+  });
+}
+
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-(async()=>{await Promise.all([loadSharedRecords(),loadIbge()]);render()})();
+(async()=>{await Promise.all([loadSharedRecords(),loadIbge()]);render();startCityRegistryWatcher()})();
 </script></body></html>
