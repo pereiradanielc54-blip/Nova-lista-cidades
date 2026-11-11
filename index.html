@@ -156,6 +156,12 @@ body.apk-webview .field select{
 .deadline-holidays ul{margin:5px 0 0;padding-left:18px}
 @media(max-width:430px){.deadline-calc-panel{padding:12px}.deadline-date-result{font-size:20px}}
 
+/* Marcador especial da filial de Goiânia */
+.branch-current-marker{background:transparent;border:0}
+.branch-current-marker .current-pin{position:relative;width:24px;height:24px;border-radius:50%;background:#ef3038;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,48,56,.22),0 2px 12px rgba(0,0,0,.5)}
+.branch-current-marker .current-pin:after{content:"";position:absolute;inset:-8px;border:2px solid rgba(239,48,56,.55);border-radius:50%;animation:currentPinPulse 1.8s ease-out infinite}
+@keyframes currentPinPulse{0%{transform:scale(.65);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+
 </style><style>/* Consulta pública: painel administrativo fica no projeto separado. */#openSettings,#settingsPanel{display:none!important}</style>
 <style>
 .map-toolbar{display:flex;justify-content:stretch;margin:14px 0 4px}
@@ -243,11 +249,6 @@ async function loadSharedRecords(){remoteReady=false;try{const rows=await dbRequ
 
 
 
-/* Marcador especial da filial de Goiânia */
-.branch-current-marker{background:transparent;border:0}
-.branch-current-marker .current-pin{position:relative;width:24px;height:24px;border-radius:50%;background:#ef3038;border:3px solid #fff;box-shadow:0 0 0 5px rgba(239,48,56,.22),0 2px 12px rgba(0,0,0,.5)}
-.branch-current-marker .current-pin:after{content:"";position:absolute;inset:-8px;border:2px solid rgba(239,48,56,.55);border-radius:50%;animation:currentPinPulse 1.8s ease-out infinite}
-@keyframes currentPinPulse{0%{transform:scale(.65);opacity:.9}100%{transform:scale(1.8);opacity:0}}
 
 /* Mapa regional da União — preencher BRANCH_POINTS com os endereços oficiais recebidos. */
 const BRANCH_POINTS = [
@@ -302,7 +303,9 @@ function renderBranchMap(){
     const bounds=[];
     BRANCH_POINTS.forEach(point=>{
       if(!Number.isFinite(point.lat)||!Number.isFinite(point.lng)) return;
-      const marker=L.marker([point.lat,point.lng]).addTo(branchesMapInstance);
+      const marker=point.current
+        ? L.marker([point.lat,point.lng],{icon:L.divIcon({className:'branch-current-marker',html:'<div class="current-pin"></div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(branchesMapInstance)
+        : L.marker([point.lat,point.lng]).addTo(branchesMapInstance);
       const popup=document.createElement('div');
       const title=document.createElement('strong');
       title.textContent=point.name||'Filial União Transportes';
