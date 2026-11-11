@@ -162,6 +162,8 @@ body.apk-webview .field select{
 .branch-current-marker .current-pin:after{content:"";position:absolute;inset:-8px;border:2px solid rgba(239,48,56,.55);border-radius:50%;animation:currentPinPulse 1.8s ease-out infinite}
 @keyframes currentPinPulse{0%{transform:scale(.65);opacity:.9}100%{transform:scale(1.8);opacity:0}}
 
+
+.coverage-legend{display:inline-block;width:12px;height:12px;margin:0 6px 0 2px;vertical-align:-1px;border:2px solid #16a34a;border-radius:3px;background:rgba(34,197,94,.38);box-shadow:0 0 10px #22c55e66}
 </style><style>/* Consulta pública: painel administrativo fica no projeto separado. */#openSettings,#settingsPanel{display:none!important}</style>
 <style>
 .map-toolbar{display:flex;justify-content:stretch;margin:14px 0 4px}
@@ -189,7 +191,7 @@ body.apk-webview .field select{
     <div>
       <div class="map-eyebrow">REDE UNIÃO TRANSPORTES</div>
       <h2>Filiais no mapa</h2>
-      <p>Mapa rodoviário com zoom e navegação pelas regiões atendidas.</p>
+      <p>Clique em uma filial para destacar em verde os municípios cadastrados como atendidos por ela.</p>
     </div>
     <button class="close" id="closeBranchesMap" type="button">Fechar</button>
   </div>
@@ -197,7 +199,7 @@ body.apk-webview .field select{
     Mapa regional preparado para Tocantins, Pará, Maranhão, Goiás e São Paulo. Os pontos serão posicionados depois que você enviar os endereços completos das filiais.
   </div>
   <div id="branchesMap" role="application" aria-label="Mapa interativo das filiais da União Transportes"></div>
-  <div class="map-footnote">Mapa de ruas do OpenStreetMap · Use os controles ou os gestos para aproximar e afastar.</div>
+  <div class="map-footnote"><span class="coverage-legend" aria-hidden="true"></span> Área verde: municípios cadastrados para a filial selecionada · Limites municipais: IBGE · Ruas: OpenStreetMap.</div>
 </section><section id="result" class="result hidden" aria-live="polite"></section><section id="noMatch" class="empty hidden">Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.</section><section id="coverageWarning" class="coverage-warning hidden" aria-live="polite"></section><section id="settingsPanel" class="settings-panel hidden"><div class="panel-head"><h2>Cadastro de filiais e cidades</h2><button class="close" id="closeSettings" type="button" onclick="document.getElementById('settingsPanel').classList.add('hidden');document.getElementById('openSettings').setAttribute('aria-expanded','false')">Fechar</button></div><p id="syncStatus">Os dados ficam compartilhados entre os dispositivos pelo Supabase. As alterações são salvas diretamente no banco.</p><div id="adminWorkspace"><div class="tabs" role="tablist"><button class="tab active" id="tabBranches" type="button" role="tab" aria-selected="true">🏢 Cadastrar filiais</button><button class="tab" id="tabCities" type="button" role="tab" aria-selected="false">📍 Cadastrar cidades</button></div><section id="branchTab"><form id="branchForm"><input id="editingId" type="hidden"><div class="field"><label for="branchName">Nome ou código da filial</label><input id="branchName" required maxlength="90" placeholder="Ex.: 006 — Goiânia"></div><button class="primary" id="saveBranch" type="submit">Cadastrar filial</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas</div><div id="branchList" class="list"></div></section><section id="cityTab" class="hidden"><form id="cityForm"><input id="editingCityKey" type="hidden"><input id="editingCityBranch" type="hidden"><div class="field"><label for="cityUf">Estado (UF)</label><select id="cityUf" required><option value="">Selecione uma UF</option></select></div><div class="field"><label for="cityName">Nome da cidade</label><input id="cityName" required maxlength="90" placeholder="Escolha a UF e digite a cidade" autocomplete="off" aria-autocomplete="list" aria-controls="municipalityOptions"><div id="municipalityOptions" class="municipality-options" role="listbox" aria-label="Sugestões de municípios"></div><datalist id="municipalitySuggestions" class="hidden"></datalist><small id="municipalityHint" style="display:block;color:var(--muted);margin-top:6px">Selecione uma UF para ver sugestões de municípios.</small></div><div class="field"><label for="cityObservation">Observação (opcional)</label><input id="cityObservation" maxlength="300" placeholder="Ex.: Atendimento somente às terças"></div><div class="field"><label for="cityBranch">Filial cadastrada responsável</label><select id="cityBranch" required><option value="">Selecione uma filial cadastrada</option></select></div><div class="field"><label for="cityDeliveryDays">Previsão de entrega</label><select id="cityDeliveryDays" required><option value="7">7 dias</option><option value="9">9 dias</option><option value="12">12 dias</option><option value="15">15 dias</option><option value="18">18 dias</option></select></div><div class="field"><label for="cityRedespacho">É redespacho?</label><select id="cityRedespacho" required><option value="nao">Não</option><option value="sim">Sim</option></select></div><button class="primary" id="saveCity" type="submit">Cadastrar cidade</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelCityEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas — toque para ver as cidades</div><div id="cityList" class="list"></div></section></div></section><p class="footer">UNIÃO TRANSPORTES · Consulta interna de atendimento</p></main><script>
 if(location.hostname.toLowerCase()==="lista-cidades.vercel.app"){const adminButton=document.getElementById("openSettings");if(adminButton)adminButton.remove();const noMatch=document.getElementById("noMatch");if(noMatch)noMatch.innerHTML="Não encontramos essa cidade no cadastro. Confira a escrita ou entre em contato com a União Transportes.";}const SUPABASE_URL="https://ioxxlfcygmkrktesocqn.supabase.co";const SUPABASE_KEY="sb_publishable_dQ7zjxVT2nlCHnnHurg1ZQ_J6irE9Kp";const apiHeaders={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};async function dbRequest(path,options={}){const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers:{...apiHeaders,...(options.headers||{})}});const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!response.ok)throw new Error(data?.message||data?.details||("Supabase HTTP "+response.status+": "+raw.slice(0,240)));return data}let remoteReady=false;let records=[];const $=id=>document.getElementById(id);const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('pt-BR');let saveInProgress=false;let confirmedRecords=[];const cloneRecords=list=>list.map(r=>({...r,cities:[...r.cities],citySettings:{...(r.citySettings||{})}}));const save=async()=>{if(saveInProgress){alert('Já existe uma gravação em andamento. Aguarde a conclusão.');return}if(!remoteReady){alert('Os dados compartilhados ainda não foram carregados. Atualize a página e tente novamente antes de editar.');return}saveInProgress=true;const submitButtons=[$('saveBranch'),$('saveCity')],previous=submitButtons.map(b=>b.disabled);submitButtons.forEach(b=>b.disabled=true);try{const data=await dbRequest("city_directory?id=eq.1&select=id",{method:"PATCH",headers:{"Prefer":"return=representation"},body:JSON.stringify({records})});if(!Array.isArray(data)||!data.some(row=>row.id===1))throw new Error("Nenhuma linha foi atualizada. Verifique as permissões de gravação do banco.");confirmedRecords=cloneRecords(records);render();$('syncStatus').textContent='Dados sincronizados com o Supabase.'}catch(error){alert('Não foi possível salvar no Supabase. As alterações não foram confirmadas. '+(error?.message||'Erro desconhecido.'));console.error(error);try{const rows=await dbRequest("city_directory?id=eq.1&select=records");const data=Array.isArray(rows)?rows[0]:null;if(data&&Array.isArray(data.records)){records=cloneRecords(data.records);confirmedRecords=cloneRecords(data.records);render();return}}catch(readError){console.error(readError)}records=cloneRecords(confirmedRecords);render()}finally{saveInProgress=false;submitButtons.forEach((b,i)=>b.disabled=previous[i])}};const IBGE='https://servicodados.ibge.gov.br/api/v1/localidades';const coverageUfs=new Set(['PA','TO','AP','MA','PI','SP']);const ufNames={AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};let ibgeStates=[],ibgeCities=[],ibgeLoaded=false;async function loadIbge(){try{const [s,m]=await Promise.all([fetch(IBGE+'/estados?orderBy=nome'),fetch(IBGE+'/municipios')]);if(!s.ok||!m.ok)throw new Error('API do IBGE indisponível');ibgeStates=await s.json();ibgeCities=await m.json();ibgeLoaded=true;const sel=$('cityUf');const current=sel.value;sel.innerHTML='<option value="">Selecione uma UF</option>';ibgeStates.sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).forEach(x=>{const o=document.createElement('option');o.value=x.sigla;o.textContent=x.nome+' ('+x.sigla+')';sel.append(o)});sel.value=current;updateMunicipalitySuggestions()}catch(e){console.warn('Não foi possível carregar os municípios do IBGE',e);$('municipalityHint').textContent='Sugestões automáticas indisponíveis no momento; informe a cidade manualmente.'}}function updateMunicipalitySuggestions(){const uf=$('cityUf').value,list=$('municipalitySuggestions');list.innerHTML='';if(!uf||!ibgeLoaded){$('municipalityHint').textContent=uf?'Carregando ou indisponível a lista de municípios.':'Selecione uma UF para ver sugestões de municípios.';return}const state=ibgeStates.find(x=>x.sigla===uf);if(!state){$('municipalityHint').textContent='Não foi possível identificar essa UF.';return}fetch(IBGE+'/estados/'+state.id+'/municipios?orderBy=nome').then(r=>{if(!r.ok)throw new Error('IBGE HTTP '+r.status);return r.json()}).then(filtered=>{if($('cityUf').value!==uf)return;list.innerHTML='';const names=new Set(filtered.map(x=>x.nome));allCities().filter(x=>!x.uf||x.uf===uf).forEach(x=>names.add(x.city));[...names].sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(name=>{const o=document.createElement('option');o.value=name;list.append(o)});renderMunicipalityOptions();$('municipalityHint').textContent=names.size+' sugestões de cidades para '+ufNames[uf]+' (IBGE e cadastro interno).'}).catch(e=>{$('municipalityHint').textContent='Sugestões indisponíveis no momento; informe a cidade manualmente.';console.warn(e)})}function renderMunicipalityOptions(){const box=$('municipalityOptions');if(!box)return;box.innerHTML='';const uf=$('cityUf').value,q=norm($('cityName').value);if(!uf||!ibgeLoaded||q.length<1)return;const state=ibgeStates.find(x=>x.sigla===uf);const names=new Set();ibgeCities.filter(x=>norm(x.nome).includes(q)&&getIbgeState(x)?.sigla===uf).slice(0,30).forEach(x=>names.add(x.nome));allCities().filter(x=>(!x.uf||x.uf===uf)&&norm(x.city).includes(q)).forEach(x=>names.add(x.city));[...names].sort((a,b)=>a.localeCompare(b,'pt-BR')).slice(0,10).forEach(name=>{const b=document.createElement('button');b.type='button';b.className='municipality-option';b.setAttribute('role','option');const title=document.createElement('strong');title.textContent=name;const small=document.createElement('small');small.textContent=(allCities().some(x=>norm(x.city)===norm(name)&&(!x.uf||x.uf===uf))?'Já consta no cadastro':'Município de '+(ufNames[uf]||uf));b.append(title,small);b.onclick=()=>{$('cityName').value=name;box.innerHTML='';$('municipalityHint').textContent='Cidade selecionada: '+name+' ('+uf+').'};box.append(b)})} 
 function cityConfig(r,city){const cfg=(r.citySettings||{})[norm(city)]||{};return {deliveryDays:cfg.deliveryDays||r.deliveryDays||'7',redespacho:cfg.redespacho||r.redespacho||'nao',observation:cfg.observation||'',uf:cfg.uf||''}}function allCities(){return records.flatMap(r=>r.cities.map(city=>({...cityConfig(r,city),city,branch:r.name,id:r.id}))).sort((a,b)=>a.city.localeCompare(b.city,'pt-BR'))}function parsedSearch(value){const raw=String(value||'').trim();const m=raw.match(/^(.*?)\s*(?:,|-|\()\s*([A-Za-z]{2})\)?$/);return m?{city:m[1].trim(),uf:m[2].toUpperCase()}:{city:raw,uf:''}}function showCoverageWarning(uf){$('result').classList.add('hidden');$('noMatch').classList.add('hidden');const box=$('coverageWarning');box.classList.remove('hidden');box.innerHTML='';const title=document.createElement('strong');title.textContent='Ainda não atendemos essa região.';const p=document.createElement('div');p.textContent='No momento, atendemos as seguintes regiões: Pará (PA), Tocantins (TO), Amapá (AP), Maranhão (MA) e Piauí (PI).';box.append(title,p)}async function checkExternalCity(city,uf){if(!ibgeLoaded||!city)return false;const matches=ibgeCities.filter(x=>norm(x.nome)===norm(city));const match=matches.find(x=>{const state=x['regiao-imediata']?.['regiao-intermediaria']?.UF||x.microrregiao?.mesorregiao?.UF;return uf?state?.sigla===uf:!!state});if(!match)return false;const state=match['regiao-imediata']?.['regiao-intermediaria']?.UF||match.microrregiao?.mesorregiao?.UF;const stateUf=state?.sigla;if(stateUf&&!coverageUfs.has(stateUf)){showCoverageWarning(stateUf);return true}return false}
@@ -291,11 +293,142 @@ function loadLeafletLibrary(){
   });
 }
 
+const IBGE_MALHAS='https://servicodados.ibge.gov.br/api/v3/malhas';
+const municipalityBoundaryCache=new Map();
+let branchesCoverageLayer=null;
+
+function compactMapName(value){return norm(value).replace(/[^a-z0-9]/g,'')}
+function branchTownFromPoint(point){return String(point.city||'').replace(/\s*[–—-]\s*[A-Z]{2}\s*$/,'').trim()}
+function findRecordForMapPoint(point){
+  const town=compactMapName(branchTownFromPoint(point));
+  if(!town||!Array.isArray(records))return null;
+  const candidates=records.map(record=>{
+    const name=compactMapName(record.name);
+    let score=0;
+    if(name===town)score=100;
+    else if(name.includes(town))score=90;
+    else if(town.includes(name)&&name.length>=4)score=75;
+    return {record,score};
+  }).filter(item=>item.score>0).sort((a,b)=>b.score-a.score);
+  if(!candidates.length||candidates.length>1&&candidates[0].score===candidates[1].score)return null;
+  return candidates[0].record;
+}
+
+async function getMunicipalityMesh(uf){
+  if(municipalityBoundaryCache.has(uf))return municipalityBoundaryCache.get(uf);
+  const state=ibgeStates.find(item=>item.sigla===uf);
+  if(!state)throw new Error('UF '+uf+' não encontrada na lista do IBGE.');
+  const pending=(async()=>{
+    const url=IBGE_MALHAS+'/estados/'+state.id+'?intrarregiao=municipio&formato=application/vnd.geo+json&qualidade=minima';
+    const response=await fetch(url);
+    if(!response.ok)throw new Error('IBGE HTTP '+response.status+' para '+uf);
+    const geojson=await response.json();
+    if(!geojson||!Array.isArray(geojson.features))throw new Error('A malha municipal de '+uf+' veio em formato inesperado.');
+    return geojson.features;
+  })();
+  municipalityBoundaryCache.set(uf,pending);
+  try{return await pending}catch(error){municipalityBoundaryCache.delete(uf);throw error}
+}
+
+function clearBranchCoverage(){
+  if(branchesCoverageLayer&&branchesMapInstance){
+    branchesMapInstance.removeLayer(branchesCoverageLayer);
+    branchesCoverageLayer=null;
+  }
+}
+
+async function showBranchCoverage(point,marker){
+  const status=$('branchesMapStatus');
+  clearBranchCoverage();
+  marker.openPopup();
+  if(!remoteReady){
+    status.textContent='Não foi possível carregar o cadastro de cidades. Atualize a página e tente novamente.';
+    return;
+  }
+  const branch=findRecordForMapPoint(point);
+  if(!branch){
+    status.textContent='Não encontrei uma filial correspondente a '+branchTownFromPoint(point)+' no cadastro. Confira o nome da filial nas Configurações.';
+    branchesMapInstance.setView([point.lat,point.lng],8);
+    return;
+  }
+  if(!branch.cities||!branch.cities.length){
+    status.textContent=branch.name+': nenhuma cidade está cadastrada para esta filial.';
+    branchesMapInstance.setView([point.lat,point.lng],8);
+    return;
+  }
+  if(!ibgeLoaded||!Array.isArray(ibgeCities)||!ibgeCities.length){
+    status.textContent='A lista de municípios do IBGE ainda não está disponível. Tente novamente em instantes.';
+    return;
+  }
+
+  status.textContent='Consultando os limites oficiais dos municípios de '+branch.name+'…';
+  const wantedByUf=new Map();
+  const unresolved=[];
+  branch.cities.forEach(cityName=>{
+    const cfg=cityConfig(branch,cityName);
+    const matches=ibgeCities.filter(item=>compactMapName(item.nome)===compactMapName(cityName));
+    let uf=String(cfg.uf||'').toUpperCase();
+    if(!uf&&matches.length===1)uf=getIbgeState(matches[0])?.sigla||'';
+    if(!uf){
+      unresolved.push(cityName+(matches.length>1?' (UF necessária para diferenciar municípios homônimos)':' (UF não cadastrada)'));
+      return;
+    }
+    const municipality=matches.find(item=>getIbgeState(item)?.sigla===uf);
+    if(!municipality){
+      unresolved.push(cityName+' – '+uf+' (não localizado no IBGE)');
+      return;
+    }
+    if(!wantedByUf.has(uf))wantedByUf.set(uf,new Set());
+    wantedByUf.get(uf).add(String(municipality.id));
+  });
+
+  const features=[];
+  const failedUfs=[];
+  for(const [uf,codes] of wantedByUf.entries()){
+    try{
+      const stateFeatures=await getMunicipalityMesh(uf);
+      stateFeatures.forEach(feature=>{
+        const code=String(feature.id??feature.properties?.id??feature.properties?.CD_MUN??'');
+        if(codes.has(code))features.push(feature);
+      });
+    }catch(error){
+      failedUfs.push(uf);
+      console.warn('Falha ao carregar a malha municipal de '+uf,error);
+    }
+  }
+
+  if(features.length){
+    branchesCoverageLayer=L.geoJSON({type:'FeatureCollection',features},{
+      style:{
+        color:'#16a34a',
+        weight:2,
+        opacity:.98,
+        fillColor:'#22c55e',
+        fillOpacity:.34
+      },
+      interactive:true
+    }).addTo(branchesMapInstance);
+    const bounds=branchesCoverageLayer.getBounds();
+    if(bounds.isValid())branchesMapInstance.fitBounds(bounds,{padding:[26,26],maxZoom:8});
+    branchesCoverageLayer.bringToFront();
+    marker.setZIndexOffset(1000);
+  }
+
+  const summary=branch.name+': '+features.length+' de '+branch.cities.length+' município(s) cadastrado(s) destacados em verde.';
+  const details=[];
+  if(unresolved.length)details.push(unresolved.length+' sem correspondência: '+unresolved.slice(0,5).join(', ')+(unresolved.length>5?'…':'')+'.');
+  if(failedUfs.length)details.push('Não foi possível carregar a malha de: '+failedUfs.join(', ')+'.');
+  if(!features.length)details.push('Nenhum limite pôde ser desenhado. Confira as UFs e os nomes no cadastro.');
+  status.textContent=[summary,...details].join(' ');
+}
+
 function renderBranchMap(){
   const status=$('branchesMapStatus');
   const mapElement=$('branchesMap');
-  if(!window.L) throw new Error('A biblioteca do mapa não foi carregada.');
-  if(branchesMapInstance) branchesMapInstance.remove();
+  if(!window.L)throw new Error('A biblioteca do mapa não foi carregada.');
+  if(branchesMapInstance)branchesMapInstance.remove();
+  branchesCoverageLayer=null;
+  municipalityBoundaryCache.clear();
   branchesMapInstance=L.map(mapElement,{zoomControl:true,scrollWheelZoom:true,preferCanvas:true,minZoom:3,maxZoom:19});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     maxZoom:19,
@@ -305,10 +438,10 @@ function renderBranchMap(){
   if(BRANCH_POINTS.length){
     const bounds=[];
     BRANCH_POINTS.forEach(point=>{
-      if(!Number.isFinite(point.lat)||!Number.isFinite(point.lng)) return;
+      if(!Number.isFinite(point.lat)||!Number.isFinite(point.lng))return;
       const marker=point.current
-        ? L.marker([point.lat,point.lng],{icon:L.divIcon({className:'branch-current-marker',html:'<div class="current-pin"></div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(branchesMapInstance)
-        : L.marker([point.lat,point.lng]).addTo(branchesMapInstance);
+        ?L.marker([point.lat,point.lng],{icon:L.divIcon({className:'branch-current-marker',html:'<div class="current-pin"></div>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(branchesMapInstance)
+        :L.marker([point.lat,point.lng]).addTo(branchesMapInstance);
       const popup=document.createElement('div');
       const title=document.createElement('strong');
       title.textContent=point.name||'Filial União Transportes';
@@ -318,19 +451,25 @@ function renderBranchMap(){
         city.textContent=point.city;
         popup.appendChild(city);
       }
+      const hint=document.createElement('small');
+      hint.textContent='Clique no marcador para destacar a área atendida em verde.';
+      hint.style.display='block';
+      hint.style.marginTop='5px';
+      popup.appendChild(hint);
       marker.bindPopup(popup);
+      marker.on('click',()=>{showBranchCoverage(point,marker)});
       bounds.push([point.lat,point.lng]);
     });
     if(bounds.length){
       branchesMapInstance.fitBounds(bounds,{padding:[30,30],maxZoom:7});
-      status.textContent=bounds.length+' filial(is) posicionada(s) no mapa. Toque em um marcador para ver a identificação da unidade.';
-    } else {
+      status.textContent='Clique em um dos '+bounds.length+' marcadores para ver em verde os municípios associados à filial no cadastro.';
+    }else{
       branchesMapInstance.fitBounds(MAP_INITIAL_BOUNDS,{padding:[18,18]});
-      status.textContent='O mapa está pronto. Os marcadores serão exibidos assim que as coordenadas oficiais forem incluídas.';
+      status.textContent='O mapa está pronto, mas não há coordenadas válidas para exibir.';
     }
-  } else {
+  }else{
     branchesMapInstance.fitBounds(MAP_INITIAL_BOUNDS,{padding:[18,18]});
-    status.textContent='Mapa regional preparado para Tocantins, Pará, Maranhão, Goiás e São Paulo. Os pontos serão posicionados com base nos endereços oficiais que você enviar.';
+    status.textContent='Não há filiais com coordenadas configuradas.';
   }
   setTimeout(()=>branchesMapInstance&&branchesMapInstance.invalidateSize(),120);
 }
@@ -358,6 +497,8 @@ openBranchesMap.addEventListener('click',async()=>{
   branchesMapLoading=true;
   $('branchesMapStatus').textContent='Carregando mapa de ruas…';
   try{
+    if(!remoteReady)await loadSharedRecords();
+    if(!ibgeLoaded)await loadIbge();
     await loadLeafletLibrary();
     renderBranchMap();
   }catch(error){
