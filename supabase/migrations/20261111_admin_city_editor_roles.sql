@@ -10,7 +10,7 @@ create table if not exists public.city_directory_admins (
 alter table public.city_directory_admins enable row level security;
 revoke all on public.city_directory_admins from anon, authenticated;
 
-do $
+do $migration$
 declare
   target_user_id uuid;
 begin
@@ -34,7 +34,7 @@ begin
   values (target_user_id)
   on conflict (user_id) do nothing;
 end;
-$;
+$migration$;
 
 create or replace function public.city_directory_is_admin()
 returns boolean
