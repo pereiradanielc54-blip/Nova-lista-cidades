@@ -25,8 +25,10 @@ begin
   end if;
 
   -- Ensure the selected ADM account is authorized to use the panel.
-  insert into public.city_directory_editors (user_id)
-  values (target_user_id)
+  insert into public.city_directory_editors (user_id, email)
+  select id, email
+  from auth.users
+  where id = target_user_id
   on conflict (user_id) do nothing;
 
   -- Grant full administrator role only to the selected account.
