@@ -1,6 +1,6 @@
 -- Separate full administrators from city-only editors.
--- Existing authorized editors are promoted once during rollout so the current
--- administrator keeps access. Newly created users are NOT inserted here.
+-- Only the explicitly identified account below becomes a full administrator.
+-- Existing users keep their city-editor access; newly created users are not admins.
 
 create table if not exists public.city_directory_admins (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -10,9 +10,31 @@ create table if not exists public.city_directory_admins (
 alter table public.city_directory_admins enable row level security;
 revoke all on public.city_directory_admins from anon, authenticated;
 
-insert into public.city_directory_admins (user_id)
-select user_id from public.city_directory_editors
-on conflict (user_id) do nothing;
+do $
+declare
+  target_user_id uuid;
+begin
+  select id
+    into target_user_id
+  from auth.users
+  where lower(email) = lower('pereiradanielc54@gmail.com')
+  limit 1;
+
+  if target_user_id is null then
+    raise exception 'ADM account pereiradanielc54@gmail.com was not found in Supabase Auth. Create/sign in to this account first, then rerun this migration.';
+  end if;
+
+  -- Ensure the selected ADM account is authorized to use the panel.
+  insert into public.city_directory_editors (user_id)
+  values (target_user_id)
+  on conflict (user_id) do nothing;
+
+  -- Grant full administrator role only to the selected account.
+  insert into public.city_directory_admins (user_id)
+  values (target_user_id)
+  on conflict (user_id) do nothing;
+end;
+$;
 
 create or replace function public.city_directory_is_admin()
 returns boolean
