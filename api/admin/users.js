@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     // de edição que o painel exige no login.
     const { error: grantError } = await supabaseAdmin
       .from("city_directory_editors")
-      .insert({ user_id: newUser.id });
+      .insert({ user_id: newUser.id, email: newUser.email });
 
     if (grantError) {
       const { error: rollbackError } =
