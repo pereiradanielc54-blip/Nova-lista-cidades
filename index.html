@@ -180,7 +180,42 @@ body.apk-webview .field select{
 #branchesMap .leaflet-control-attribution{font-size:10px}
 #branchesMap .leaflet-popup-content-wrapper{border-radius:10px}
 @media(max-width:600px){.branches-map-panel{padding:13px;border-radius:17px}.map-heading h2{font-size:20px}.map-heading .close{padding:9px 10px;font-size:12px}#branchesMap{height:440px;min-height:340px}.map-trigger{padding:13px}}
-</style></head><body class="customer-web"><script>(function(){var ua=navigator.userAgent||"";if(/;\s*wv\)/i.test(ua)||(/Android/i.test(ua)&&/Version\/\d/.test(ua)&&/Chrome\//i.test(ua)&&!window.matchMedia("(display-mode: browser)").matches)){document.body.classList.add("apk-webview")}})();</script><header><div class="brand"><div class="mark">T</div><div><strong>UNIÃO</strong><small>TRANSPORTES</small></div></div><button class="settings" id="openSettings" type="button" aria-expanded="false" onclick="var p=document.getElementById('settingsPanel');if(p){var opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);this.setAttribute('aria-expanded',String(opening));if(opening)p.scrollIntoView({behavior:'smooth',block:'start'});}">⚙ Cadastro</button></header><main><section class="intro"><div class="eyebrow"><span class="eyebrow-dot"></span> Consulta operacional</div><h1>Encontre a filial certa.<br><span class="headline-accent">Siga seu caminho.</span></h1><p>Consulte cidades, localize nossas filiais e encontre as informações de que você precisa com rapidez e praticidade.</p></section><section class="search-card"><label for="citySearch">Buscar cidade</label><div class="search-wrap"><input id="citySearch" type="search" placeholder="Digite o nome da cidade…" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions"><button class="clear" id="clearSearch">Limpar</button></div><div class="section-title hidden" id="suggestionTitle">Selecione uma cidade</div><div class="suggestions hidden" id="suggestions" role="listbox" aria-label="Sugestões de cidades"></div></section>
+</style>
+<style>
+.lookup-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 20px;padding:5px;border:1px solid rgba(126,203,255,.24);border-radius:15px;background:rgba(1,12,29,.42)}
+.lookup-mode{min-width:0;padding:12px 10px;border:1px solid transparent;border-radius:11px;background:transparent;color:#a9c4dc;font:inherit;font-weight:800;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.lookup-mode.active{color:#fff;border-color:#58d9ff88;background:linear-gradient(120deg,#104b78,#155078 55%,#087b83);box-shadow:inset 0 -2px #76ffe2,0 0 20px #087bc022}
+.lookup-mode:focus-visible,.cep-submit:focus-visible{outline:2px solid #7cecff;outline-offset:3px}
+.cep-help{margin:12px 2px 0;color:var(--muted);font-size:12px;line-height:1.55}
+.cep-submit{white-space:nowrap;min-width:104px}
+.cep-feedback{margin-top:13px;padding:11px 13px;border:1px solid rgba(86,202,255,.35);border-radius:12px;background:rgba(5,36,62,.62);color:#d8f4ff;font-size:13px;line-height:1.55}
+.cep-feedback.error{border-color:#bd6969;background:rgba(75,25,34,.48);color:#ffd4d4}
+.cep-feedback.success{border-color:#40c69c;background:rgba(8,65,57,.48);color:#c8ffeb}
+.cep-origin-note{margin-top:14px;padding-top:11px;border-top:1px solid rgba(126,203,255,.2);font-size:12px;color:#b9d7ec!important}
+@media(max-width:430px){.lookup-mode{padding:11px 8px;font-size:13px}.cep-submit{min-width:94px;padding:11px 12px}.cep-help{font-size:11px}}
+</style></head><body class="customer-web"><script>(function(){var ua=navigator.userAgent||"";if(/;\s*wv\)/i.test(ua)||(/Android/i.test(ua)&&/Version\/\d/.test(ua)&&/Chrome\//i.test(ua)&&!window.matchMedia("(display-mode: browser)").matches)){document.body.classList.add("apk-webview")}})();</script><header><div class="brand"><div class="mark">T</div><div><strong>UNIÃO</strong><small>TRANSPORTES</small></div></div><button class="settings" id="openSettings" type="button" aria-expanded="false" onclick="var p=document.getElementById('settingsPanel');if(p){var opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);this.setAttribute('aria-expanded',String(opening));if(opening)p.scrollIntoView({behavior:'smooth',block:'start'});}">⚙ Cadastro</button></header><main><section class="intro"><div class="eyebrow"><span class="eyebrow-dot"></span> Consulta operacional</div><h1>Encontre a filial certa.<br><span class="headline-accent">Siga seu caminho.</span></h1><p>Consulte cidades, localize nossas filiais e encontre as informações de que você precisa com rapidez e praticidade.</p></section><section class="search-card">
+  <div class="lookup-mode-switch" role="group" aria-label="Forma de consulta">
+    <button class="lookup-mode active" id="lookupByCity" type="button" aria-pressed="true">Por cidade</button>
+    <button class="lookup-mode" id="lookupByCep" type="button" aria-pressed="false">Por CEP</button>
+  </div>
+  <div id="cityLookupPane" class="lookup-pane">
+    <label for="citySearch">Buscar cidade</label>
+    <div class="search-wrap"><input id="citySearch" type="search" placeholder="Digite o nome da cidade…" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions"><button class="clear" id="clearSearch" type="button">Limpar</button></div>
+    <div class="section-title hidden" id="suggestionTitle">Selecione uma cidade</div>
+    <div class="suggestions hidden" id="suggestions" role="listbox" aria-label="Sugestões de cidades"></div>
+  </div>
+  <div id="cepLookupPane" class="lookup-pane hidden">
+    <form id="cepLookupForm">
+      <label for="cepInput">Digite o CEP</label>
+      <div class="search-wrap">
+        <input id="cepInput" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="Ex.: 74000-000" aria-describedby="cepHelp">
+        <button class="clear cep-submit" id="cepSubmit" type="submit">Consultar</button>
+      </div>
+    </form>
+    <p class="cep-help" id="cepHelp">Vamos identificar a cidade e conferir se ela está cadastrada na União Transportes.</p>
+    <div class="cep-feedback hidden" id="cepFeedback" role="status" aria-live="polite"></div>
+  </div>
+</section>
 <div class="map-toolbar">
   <button class="map-trigger" id="openBranchesMap" type="button" aria-expanded="false" aria-controls="branchesMapPanel">
     <span aria-hidden="true">📍</span> Mapa das filiais
@@ -355,8 +390,82 @@ function update(){output.replaceChildren();const startDate=parseLocalDate(input.
 toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));if(opening)update()});input.addEventListener('change',update);return wrap}
 let deadlineCalculatorSequence=0;
 function showCity(city,uf=''){const found=allCities().filter(x=>norm(x.city)===norm(city)&&(!uf||!x.uf||x.uf===uf)),box=$('result');box.classList.remove('hidden');$('noMatch').classList.add('hidden');$('coverageWarning').classList.add('hidden');box.innerHTML='';const label=document.createElement('div');label.className='label';label.textContent=found.length>1?'Atenção · mais de uma filial cadastrada':'Filial responsável';const h=document.createElement('h2');h.textContent=city+(uf?' - '+uf:'');const p=document.createElement('p');p.textContent=found.length>1?'Encontramos mais de uma associação para esta cidade:':'Cidade localizada no cadastro.';box.append(label,h,p);found.forEach(f=>{const b=document.createElement('div');b.className='branch';const i=document.createElement('div');i.className='branch-icon';i.textContent='↗';const d=document.createElement('div'),s=document.createElement('strong'),sm=document.createElement('small');s.textContent=f.branch;sm.textContent='Previsão: '+f.deliveryDays+' dias · Redespacho: '+(f.redespacho==='sim'?'Sim':'Não');d.append(s,sm);b.append(i,d);box.append(b);box.append(buildDeadlineCalculator(f,uf||f.uf||''))})}
+
+function resetNoMatchMessage(){$('noMatch').innerHTML='Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.'}
+function setLookupMode(mode){
+  const cepMode=mode==='cep';
+  $('cityLookupPane').classList.toggle('hidden',cepMode);
+  $('cepLookupPane').classList.toggle('hidden',!cepMode);
+  $('lookupByCity').classList.toggle('active',!cepMode);
+  $('lookupByCep').classList.toggle('active',cepMode);
+  $('lookupByCity').setAttribute('aria-pressed',String(!cepMode));
+  $('lookupByCep').setAttribute('aria-pressed',String(cepMode));
+  $('result').classList.add('hidden');
+  $('noMatch').classList.add('hidden');
+  $('coverageWarning').classList.add('hidden');
+  $('cepFeedback').classList.add('hidden');
+  if(cepMode){$('cepInput').focus();}else{resetNoMatchMessage();render();if($('citySearch').value.trim())$('citySearch').dispatchEvent(new Event('input'))}
+}
+function formatCep(value){const digits=String(value||'').replace(/\D/g,'').slice(0,8);return digits.length>5?digits.slice(0,5)+'-'+digits.slice(5):digits}
+function setCepFeedback(message,type='info'){
+  const box=$('cepFeedback');
+  box.textContent=message;
+  box.className='cep-feedback'+(type==='error'?' error':type==='success'?' success':'');
+  box.classList.remove('hidden');
+}
+async function lookupCep(event){
+  event.preventDefault();
+  const cep=$('cepInput').value.replace(/\D/g,'');
+  if(cep.length!==8){setCepFeedback('Digite um CEP válido com 8 números.','error');return}
+  const button=$('cepSubmit');
+  button.disabled=true;
+  button.textContent='Consultando…';
+  setCepFeedback('Consultando o CEP e identificando o município…');
+  $('result').classList.add('hidden');
+  $('noMatch').classList.add('hidden');
+  $('coverageWarning').classList.add('hidden');
+  try{
+    const response=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
+    if(!response.ok)throw new Error('Serviço de CEP respondeu com HTTP '+response.status);
+    const address=await response.json();
+    if(address.erro){setCepFeedback('Não encontramos esse CEP. Confira os números e tente novamente.','error');return}
+    const city=String(address.localidade||'').trim();
+    const uf=String(address.uf||'').trim().toUpperCase();
+    if(!city||!/^[A-Z]{2}$/.test(uf))throw new Error('O serviço não retornou uma cidade e uma UF válidas.');
+    $('citySearch').value=city+' - '+uf;
+    if(!remoteReady)await loadSharedRecords();
+    if(!remoteReady)throw new Error('O cadastro de cidades da União não está disponível no momento.');
+    if(!coverageUfs.has(uf)){
+      showCoverageWarning(uf);
+      const detail=document.createElement('div');
+      detail.textContent='O CEP '+formatCep(cep)+' pertence a '+city+' - '+uf+'.';
+      $('coverageWarning').append(detail);
+      setCepFeedback('CEP identificado: '+city+' - '+uf+'. Essa UF está fora da área de atendimento informada no sistema.','success');
+      return;
+    }
+    const matches=allCities().filter(item=>norm(item.city)===norm(city)&&(!item.uf||item.uf===uf));
+    if(matches.length){
+      showCity(city,uf);
+      const note=document.createElement('p');
+      note.className='cep-origin-note';
+      note.textContent='CEP '+formatCep(cep)+' · Município identificado pelo serviço ViaCEP.';
+      $('result').append(note);
+      setCepFeedback('CEP localizado: '+city+' - '+uf+'. Encontramos a cidade no cadastro da União Transportes.','success');
+    }else{
+      $('noMatch').textContent='O CEP '+formatCep(cep)+' pertence a '+city+' - '+uf+', mas essa cidade ainda não está cadastrada na consulta da União Transportes.';
+      $('noMatch').classList.remove('hidden');
+      setCepFeedback('Cidade identificada, mas não localizada no cadastro de cidades da União.','error');
+    }
+  }catch(error){
+    console.error('Falha ao consultar CEP',error);
+    setCepFeedback(error?.message||'Não foi possível consultar esse CEP agora. Tente novamente.','error');
+  }finally{
+    button.disabled=false;
+    button.textContent='Consultar';
+  }
+}
 function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;switchTab('branches');$('editingId').value=id;$('branchName').value=r.name;$('saveBranch').textContent='Atualizar cadastro';$('cancelEdit').classList.remove('hidden');$('branchName').focus()}function resetForm(){$('branchForm').reset();$('editingId').value='';$('saveBranch').textContent='Cadastrar filial';$('cancelEdit').classList.add('hidden')}
-$('citySearch').addEventListener('input',render);$('cityName').addEventListener('input',renderMunicipalityOptions);$('cityUf').addEventListener('change',()=>{updateMunicipalitySuggestions();renderMunicipalityOptions()});document.addEventListener('click',e=>{if(!e.target.closest('#cityName')&&!e.target.closest('#municipalityOptions'))$('municipalityOptions').innerHTML=''});$('clearSearch').onclick=()=>{$('citySearch').value='';render();$('citySearch').focus()};$('closeSettings').onclick=()=>{$('settingsPanel').classList.add('hidden');$('openSettings').setAttribute('aria-expanded','false')};$('cancelEdit').onclick=resetForm;$('cancelCityEdit').onclick=resetCityForm;$('tabBranches').onclick=()=>switchTab('branches');$('tabCities').onclick=()=>switchTab('cities');$('cityForm').onsubmit=e=>{e.preventDefault();const city=$('cityName').value.trim(),uf=$('cityUf').value,branchId=$('cityBranch').value,deliveryDays=$('cityDeliveryDays').value,redespacho=$('cityRedespacho').value,observation=$('cityObservation').value.trim(),oldCity=$('editingCityKey').value,oldBranchId=$('editingCityBranch').value;if(!city)return alert('Informe o nome da cidade.');if(!uf)return alert('Selecione o estado (UF) da cidade.');const branch=records.find(r=>r.id===branchId);if(!branch)return alert('Selecione uma filial já cadastrada.');if(oldCity){const duplicate=records.some(r=>r.cities.some(x=>norm(x)===norm(city)&&!(r.id===oldBranchId&&norm(x)===norm(oldCity))));if(duplicate)return alert('Essa cidade já está cadastrada em outra filial.');records=records.map(r=>{const cities=[...r.cities],citySettings={...(r.citySettings||{})};if(r.id===oldBranchId){const i=cities.findIndex(x=>norm(x)===norm(oldCity));if(i>=0)cities.splice(i,1);delete citySettings[norm(oldCity)]}if(r.id===branchId){if(!cities.some(x=>norm(x)===norm(city)))cities.push(city);citySettings[norm(city)]={deliveryDays,redespacho,observation,uf}}return {...r,cities,citySettings}})}else{if(branch.cities.some(x=>norm(x)===norm(city)))return alert('Essa cidade já está cadastrada nessa filial.');branch.cities.push(city);branch.citySettings=branch.citySettings||{};branch.citySettings[norm(city)]={deliveryDays,redespacho,observation,uf}}resetCityForm();save();switchTab('cities')};$('branchForm').onsubmit=e=>{e.preventDefault();const name=$('branchName').value.trim();if(!name)return alert('Informe o nome da filial.');const id=$('editingId').value;if(id)records=records.map(r=>r.id===id?{...r,name}:r);else{if(records.some(r=>norm(r.name)===norm(name)))return alert('Já existe uma filial com esse nome ou código.');records.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,cities:[],citySettings:{}})}resetForm();save()};
+$('citySearch').addEventListener('input',()=>{resetNoMatchMessage();render()});$('lookupByCity').addEventListener('click',()=>setLookupMode('city'));$('lookupByCep').addEventListener('click',()=>setLookupMode('cep'));$('cepInput').addEventListener('input',e=>{e.target.value=formatCep(e.target.value)});$('cepLookupForm').addEventListener('submit',lookupCep);$('cityName').addEventListener('input',renderMunicipalityOptions);$('cityUf').addEventListener('change',()=>{updateMunicipalitySuggestions();renderMunicipalityOptions()});document.addEventListener('click',e=>{if(!e.target.closest('#cityName')&&!e.target.closest('#municipalityOptions'))$('municipalityOptions').innerHTML=''});$('clearSearch').onclick=()=>{$('citySearch').value='';render();$('citySearch').focus()};$('closeSettings').onclick=()=>{$('settingsPanel').classList.add('hidden');$('openSettings').setAttribute('aria-expanded','false')};$('cancelEdit').onclick=resetForm;$('cancelCityEdit').onclick=resetCityForm;$('tabBranches').onclick=()=>switchTab('branches');$('tabCities').onclick=()=>switchTab('cities');$('cityForm').onsubmit=e=>{e.preventDefault();const city=$('cityName').value.trim(),uf=$('cityUf').value,branchId=$('cityBranch').value,deliveryDays=$('cityDeliveryDays').value,redespacho=$('cityRedespacho').value,observation=$('cityObservation').value.trim(),oldCity=$('editingCityKey').value,oldBranchId=$('editingCityBranch').value;if(!city)return alert('Informe o nome da cidade.');if(!uf)return alert('Selecione o estado (UF) da cidade.');const branch=records.find(r=>r.id===branchId);if(!branch)return alert('Selecione uma filial já cadastrada.');if(oldCity){const duplicate=records.some(r=>r.cities.some(x=>norm(x)===norm(city)&&!(r.id===oldBranchId&&norm(x)===norm(oldCity))));if(duplicate)return alert('Essa cidade já está cadastrada em outra filial.');records=records.map(r=>{const cities=[...r.cities],citySettings={...(r.citySettings||{})};if(r.id===oldBranchId){const i=cities.findIndex(x=>norm(x)===norm(oldCity));if(i>=0)cities.splice(i,1);delete citySettings[norm(oldCity)]}if(r.id===branchId){if(!cities.some(x=>norm(x)===norm(city)))cities.push(city);citySettings[norm(city)]={deliveryDays,redespacho,observation,uf}}return {...r,cities,citySettings}})}else{if(branch.cities.some(x=>norm(x)===norm(city)))return alert('Essa cidade já está cadastrada nessa filial.');branch.cities.push(city);branch.citySettings=branch.citySettings||{};branch.citySettings[norm(city)]={deliveryDays,redespacho,observation,uf}}resetCityForm();save();switchTab('cities')};$('branchForm').onsubmit=e=>{e.preventDefault();const name=$('branchName').value.trim();if(!name)return alert('Informe o nome da filial.');const id=$('editingId').value;if(id)records=records.map(r=>r.id===id?{...r,name}:r);else{if(records.some(r=>norm(r.name)===norm(name)))return alert('Já existe uma filial com esse nome ou código.');records.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,cities:[],citySettings:{}})}resetForm();save()};
 // A leitura é pública; a escrita é autorizada pelo RLS do banco.
 async function loadSharedRecords(){remoteReady=false;try{const rows=await dbRequest("city_directory?id=eq.1&select=id,records");const data=Array.isArray(rows)?rows[0]:null;if(!data)throw new Error("Registro principal id=1 não encontrado ou não visível.");if(!Array.isArray(data.records)||!data.records.every(r=>r&&typeof r==="object"&&typeof r.id==="string"&&typeof r.name==="string"&&Array.isArray(r.cities)&&r.cities.every(c=>typeof c==="string")))throw new Error("Os dados remotos têm formato inválido.");records=data.records;confirmedRecords=cloneRecords(records);remoteReady=true;$("syncStatus").textContent="Conectado ao Supabase. Dados compartilhados entre dispositivos.";render();return {ok:true,count:records.length}}catch(error){remoteReady=false;$("syncStatus").textContent="Falha ao carregar do Supabase: "+(error?.message||"erro desconhecido")+". Edição bloqueada até a conexão voltar.";console.error(error);render();return {ok:false,error}}}
 
