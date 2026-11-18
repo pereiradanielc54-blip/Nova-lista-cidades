@@ -47,7 +47,7 @@ export default async function handler(req, res) {
   }
 
   const authorization = req.headers.authorization || "";
-  const tokenMatch = authorization.match(/^Bearer\\s+(.+)$/i);
+  const tokenMatch = authorization.match(/^Bearer\s+(.+)$/i);
   if (!tokenMatch) {
     return send(res, 401, { error: "Sessão administrativa não encontrada. Entre novamente." });
   }
@@ -248,7 +248,7 @@ export default async function handler(req, res) {
     if (name.length < 2 || name.length > 100) {
       return send(res, 400, { error: "Informe um nome entre 2 e 100 caracteres." });
     }
-    if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return send(res, 400, { error: "Informe um e-mail válido." });
     }
     if (password.length < 10 || password.length > 72) {
