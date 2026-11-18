@@ -251,7 +251,9 @@ if(location.pathname==="/"||location.pathname==="/index.html"){const adminButton
   const existing=findExistingCityRecords(name,uf);
   if(batchMode){
    const selected=batchSelectedCities.some(item=>norm(item.name)===norm(name));
-   small.textContent=selected?'Já está na lista':(existing.length?existing.length+' cadastro(s) existentes · as regras serão atualizadas':'Toque para adicionar ao lote');
+   const existingBranches=[...new Set(existing.map(item=>item.branchName).filter(Boolean))];
+   const branchInfo=existingBranches.length?'Atendida por: '+existingBranches.join(', '):(existing.length?'Já cadastrada em filial sem identificação':'');
+   small.textContent=selected?'Já está na lista'+(branchInfo?' · '+branchInfo:''):(existing.length?branchInfo+(existing.length>1?' · '+existing.length+' vínculos existentes':'')+' · as regras serão atualizadas':'Ainda não cadastrada · toque para adicionar ao lote');
    b.disabled=selected;
    b.onclick=()=>addBatchCity(name);
   }else{
@@ -298,7 +300,8 @@ function renderBatchSelectedCities(){
   const details=document.createElement('div'),name=document.createElement('strong'),small=document.createElement('small');
   name.textContent=item.name;
   const existing=findExistingCityRecords(item.name,item.uf);
-  small.textContent=existing.length?(existing.length+' vínculo(s) existente(s) · as regras serão atualizadas'):'Cidade nova · será cadastrada na filial escolhida';
+  const existingBranches=[...new Set(existing.map(record=>record.branchName).filter(Boolean))];
+  small.textContent=existing.length?('Atendida por: '+(existingBranches.join(', ')||'filial não identificada')+' · '+existing.length+' vínculo(s) existente(s) · as regras serão atualizadas'):'Cidade nova · será cadastrada na filial escolhida';
   details.append(name,small);
   const remove=document.createElement('button');remove.type='button';remove.className='batch-remove-button';remove.textContent='Remover';remove.setAttribute('aria-label','Remover '+item.name+' da seleção');
   remove.onclick=()=>{batchSelectedCities.splice(index,1);renderBatchSelectedCities();renderMunicipalityOptions()};
