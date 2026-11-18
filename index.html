@@ -440,7 +440,8 @@ async function saveCityBatch(){
   if(targetSame&&targetSame.cfg.uf&&targetSame.cfg.uf!==uf){
    conflicts.push(item.name+' (já cadastrada na filial escolhida como '+targetSame.cfg.uf+')');continue;
   }
-  plans.push({name:item.name,key,mode:matches.length?'move':'new',matches,targetBranchId});
+  const keepSameBranch=matches.length===1&&matches[0].branchId===targetBranchId;
+  plans.push({name:item.name,key,mode:!matches.length?'new':keepSameBranch?'keep':'move',matches,targetBranchId});
  }
  if(conflicts.length){
   alert('Não foi possível aplicar o lote. Confira as filiais e os cadastros incompatíveis destas cidades:\n\n'+conflicts.join('\n')+'\n\nNenhuma alteração foi salva.');
