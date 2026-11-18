@@ -165,13 +165,23 @@ body.apk-webview .field select{
 .batch-selection-heading strong{font-size:13px;color:#a9efff}
 .batch-clear-button{padding:6px 9px;font-size:11px}
 .batch-selected-list{display:grid;gap:7px}
-.batch-selected-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid #315673;border-radius:10px;background:#0d2942}
-.batch-selected-item>div{min-width:0}
-.batch-selected-item strong{display:block;font-size:13px;overflow-wrap:anywhere}
-.batch-selected-item small{display:block;margin-top:3px;color:#9fc2d9;font-size:11px;line-height:1.4}
+.batch-selected-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px;border:1px solid #315673;border-radius:10px;background:#0d2942}
+.batch-selected-item>div{min-width:0;flex:1}
+.batch-city-toggle{display:block;width:auto!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;color:#e9f8ff!important;text-align:left;font-size:13px;font-weight:800;line-height:1.4}
+.batch-city-toggle:focus-visible{outline:2px solid #68dfff;outline-offset:3px}
+.batch-selected-item small{display:block;margin-top:5px;color:#9fc2d9;font-size:11px;line-height:1.45}
+.batch-city-editor{display:grid;gap:7px;margin-top:9px;padding:10px;border:1px solid #4b7794;border-radius:10px;background:#081d32}
+.batch-city-editor label{font-size:11px;font-weight:750;color:#bdeeff}
+.batch-branch-select{width:100%;min-width:0;padding:9px;border-radius:8px;border:1px solid #477197;background:#07182b;color:#f4fbff;font-size:12px}
+.batch-individual-note{color:#9fc2d9;font-size:10px;line-height:1.4}
 .batch-remove-button{flex:0 0 auto;padding:6px 8px;color:#ffd1d1;border-color:#9a626277;background:#482b39}
 .batch-empty{margin:0;color:#9eb5c9;font-size:12px;line-height:1.5}
 .batch-branch-hint{display:block;margin-top:7px;color:#9ed9e8;font-size:11px;line-height:1.45}
+.batch-apply-all{display:grid;gap:8px;margin-top:10px;padding:10px;border:1px solid #4b779488;border-radius:10px;background:#081d32}
+.batch-apply-all strong{font-size:11px;color:#c8f0ff}
+.batch-apply-buttons{display:flex;gap:8px}
+.batch-apply-buttons button{flex:1;padding:8px 12px;border:1px solid #466a83;border-radius:8px;background:#102b43;color:#c8dceb;font-size:12px;font-weight:800}
+.batch-apply-buttons button[aria-pressed="true"]{border-color:#48d4e3;background:linear-gradient(110deg,#087bc0,#087f91);color:#fff;box-shadow:0 0 0 1px #48d4e344}
 @media(max-width:430px){.batch-selected-item{align-items:flex-start}.batch-selection-heading{align-items:flex-start}.batch-add-button{width:100%}.batch-add-row{display:block}}
 </style></head><body class="customer-web"><script>(function(){var ua=navigator.userAgent||"";if(/;\s*wv\)/i.test(ua)||(/Android/i.test(ua)&&/Version\/\d/.test(ua)&&/Chrome\//i.test(ua)&&!window.matchMedia("(display-mode: browser)").matches)){document.body.classList.add("apk-webview")}})();</script>
 <div id="adminLoginOverlay" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle">
@@ -185,7 +195,7 @@ body.apk-webview .field select{
     <button class="primary login-submit" id="adminLoginSubmit" type="submit">Entrar</button>
   </form>
 </div>
-<header><div class="brand"><div class="mark">T</div><div><strong>UNIÃO</strong><small>TRANSPORTES</small></div></div><button class="settings" id="openSettings" type="button" aria-expanded="false" onclick="var p=document.getElementById('settingsPanel');if(p){var opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);this.setAttribute('aria-expanded',String(opening));if(opening)p.scrollIntoView({behavior:'smooth',block:'start'});}">⚙ Cadastro</button></header><main><section class="intro"><div class="eyebrow"><span class="eyebrow-dot"></span> Consulta operacional</div><h1>Encontre a filial certa.<br><span class="headline-accent">Siga seu caminho.</span></h1><p>Consulte cidades, localize nossas filiais e encontre as informações de que você precisa com rapidez e praticidade.</p></section><section class="search-card"><label for="citySearch">Buscar cidade</label><div class="search-wrap"><input id="citySearch" type="search" placeholder="Digite o nome da cidade…" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions"><button class="clear" id="clearSearch">Limpar</button></div><div class="section-title hidden" id="suggestionTitle">Selecione uma cidade</div><div class="suggestions hidden" id="suggestions" role="listbox" aria-label="Sugestões de cidades"></div></section><section id="result" class="result hidden" aria-live="polite"></section><section id="noMatch" class="empty hidden">Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.</section><section id="coverageWarning" class="coverage-warning hidden" aria-live="polite"></section><section id="settingsPanel" class="settings-panel hidden"><div class="panel-head"><h2>Cadastro de filiais e cidades</h2><button class="close" id="closeSettings" type="button" onclick="document.getElementById('settingsPanel').classList.add('hidden');document.getElementById('openSettings').setAttribute('aria-expanded','false')">Fechar</button></div><p id="syncStatus">Os dados ficam compartilhados entre os dispositivos pelo Supabase. As alterações são salvas diretamente no banco.</p><div id="adminWorkspace"><div class="tabs" role="tablist"><button class="tab active" id="tabBranches" type="button" role="tab" aria-selected="true">🏢 Filiais</button><button class="tab" id="tabCities" type="button" role="tab" aria-selected="false">📍 Cidades</button><button class="tab" id="tabUsers" type="button" role="tab" aria-selected="false">👥 Usuários</button></div><section id="branchTab"><form id="branchForm"><input id="editingId" type="hidden"><div class="field"><label for="branchName">Nome ou código da filial</label><input id="branchName" required maxlength="90" placeholder="Ex.: 006 — Goiânia"></div><button class="primary" id="saveBranch" type="submit">Cadastrar filial</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas</div><div id="branchList" class="list"></div></section><section id="cityTab" class="hidden"><form id="cityForm"><input id="editingCityKey" type="hidden"><input id="editingCityBranch" type="hidden"><div class="batch-mode-toolbar"><button id="toggleBatchMode" class="close batch-mode-toggle" type="button" aria-pressed="false">Alteração em lote</button></div><p id="batchModeHelp" class="batch-mode-help hidden">Selecione uma UF e adicione várias cidades. As cidades já cadastradas terão as regras atualizadas em todos os vínculos dessa UF; as cidades novas serão cadastradas na filial escolhida.</p><div class="field"><label for="cityUf">Estado (UF)</label><select id="cityUf" required><option value="">Selecione uma UF</option></select></div><div class="field"><label id="cityNameLabel" for="cityName">Nome da cidade</label><input id="cityName" required maxlength="90" placeholder="Escolha a UF e digite a cidade" autocomplete="off" aria-autocomplete="list" aria-controls="municipalityOptions"><div id="batchAddRow" class="batch-add-row hidden"><button id="addBatchCity" class="batch-add-button" type="button">+ Adicionar cidade digitada</button></div><div id="municipalityOptions" class="municipality-options" role="listbox" aria-label="Sugestões de municípios"></div><datalist id="municipalitySuggestions" class="hidden"></datalist><small id="municipalityHint" style="display:block;color:var(--muted);margin-top:6px">Selecione uma UF para ver sugestões de municípios.</small><div id="batchSelectionPanel" class="batch-selection-panel hidden"><div class="batch-selection-heading"><strong id="batchSelectedCount">Nenhuma cidade selecionada</strong><button id="clearBatchCities" class="batch-clear-button" type="button">Limpar lista</button></div><div id="batchSelectedCities" class="batch-selected-list"></div></div></div><div class="field"><label for="cityObservation">Observação (opcional)</label><input id="cityObservation" maxlength="300" placeholder="Ex.: Atendimento somente às terças"></div><div class="field"><label id="cityBranchLabel" for="cityBranch">Filial cadastrada responsável</label><select id="cityBranch" required><option value="">Selecione uma filial cadastrada</option></select><small id="cityBranchBatchHint" class="batch-branch-hint hidden">As cidades já existentes mantêm suas filiais atuais; esta filial será usada somente para cadastrar cidades novas do lote.</small></div><div class="field"><label for="cityDeliveryDays">Prazo / modalidade</label><select id="cityDeliveryDays" required><option value="7">7 dias úteis</option><option value="9">9 dias úteis</option><option value="10">10 dias úteis</option><option value="12">12 dias úteis</option><option value="15">15 dias úteis</option><option value="18">18 dias úteis</option><option value="retirada">Retirada na filial (sem prazo de entrega)</option></select></div><div class="field"><label for="cityRedespacho">É redespacho?</label><select id="cityRedespacho" required><option value="nao">Não</option><option value="sim">Sim</option></select></div><div id="cityLastModified" class="city-last-modified hidden" role="status" aria-live="polite"></div><button class="primary" id="saveCity" type="submit">Cadastrar cidade</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelCityEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas — toque para ver as cidades</div><div id="cityList" class="list"></div></section></div><section id="usersTab" class="hidden">
+<header><div class="brand"><div class="mark">T</div><div><strong>UNIÃO</strong><small>TRANSPORTES</small></div></div><button class="settings" id="openSettings" type="button" aria-expanded="false" onclick="var p=document.getElementById('settingsPanel');if(p){var opening=p.classList.contains('hidden');p.classList.toggle('hidden',!opening);this.setAttribute('aria-expanded',String(opening));if(opening)p.scrollIntoView({behavior:'smooth',block:'start'});}">⚙ Cadastro</button></header><main><section class="intro"><div class="eyebrow"><span class="eyebrow-dot"></span> Consulta operacional</div><h1>Encontre a filial certa.<br><span class="headline-accent">Siga seu caminho.</span></h1><p>Consulte cidades, localize nossas filiais e encontre as informações de que você precisa com rapidez e praticidade.</p></section><section class="search-card"><label for="citySearch">Buscar cidade</label><div class="search-wrap"><input id="citySearch" type="search" placeholder="Digite o nome da cidade…" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions"><button class="clear" id="clearSearch">Limpar</button></div><div class="section-title hidden" id="suggestionTitle">Selecione uma cidade</div><div class="suggestions hidden" id="suggestions" role="listbox" aria-label="Sugestões de cidades"></div></section><section id="result" class="result hidden" aria-live="polite"></section><section id="noMatch" class="empty hidden">Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.</section><section id="coverageWarning" class="coverage-warning hidden" aria-live="polite"></section><section id="settingsPanel" class="settings-panel hidden"><div class="panel-head"><h2>Cadastro de filiais e cidades</h2><button class="close" id="closeSettings" type="button" onclick="document.getElementById('settingsPanel').classList.add('hidden');document.getElementById('openSettings').setAttribute('aria-expanded','false')">Fechar</button></div><p id="syncStatus">Os dados ficam compartilhados entre os dispositivos pelo Supabase. As alterações são salvas diretamente no banco.</p><div id="adminWorkspace"><div class="tabs" role="tablist"><button class="tab active" id="tabBranches" type="button" role="tab" aria-selected="true">🏢 Filiais</button><button class="tab" id="tabCities" type="button" role="tab" aria-selected="false">📍 Cidades</button><button class="tab" id="tabUsers" type="button" role="tab" aria-selected="false">👥 Usuários</button></div><section id="branchTab"><form id="branchForm"><input id="editingId" type="hidden"><div class="field"><label for="branchName">Nome ou código da filial</label><input id="branchName" required maxlength="90" placeholder="Ex.: 006 — Goiânia"></div><button class="primary" id="saveBranch" type="submit">Cadastrar filial</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas</div><div id="branchList" class="list"></div></section><section id="cityTab" class="hidden"><form id="cityForm"><input id="editingCityKey" type="hidden"><input id="editingCityBranch" type="hidden"><div class="batch-mode-toolbar"><button id="toggleBatchMode" class="close batch-mode-toggle" type="button" aria-pressed="false">Alteração em lote</button></div><p id="batchModeHelp" class="batch-mode-help hidden">Selecione uma UF e adicione várias cidades. As cidades já cadastradas terão as regras atualizadas em todos os vínculos dessa UF; as cidades novas serão cadastradas na filial escolhida.</p><div class="field"><label for="cityUf">Estado (UF)</label><select id="cityUf" required><option value="">Selecione uma UF</option></select></div><div class="field"><label id="cityNameLabel" for="cityName">Nome da cidade</label><input id="cityName" required maxlength="90" placeholder="Escolha a UF e digite a cidade" autocomplete="off" aria-autocomplete="list" aria-controls="municipalityOptions"><div id="batchAddRow" class="batch-add-row hidden"><button id="addBatchCity" class="batch-add-button" type="button">+ Adicionar cidade digitada</button></div><div id="municipalityOptions" class="municipality-options" role="listbox" aria-label="Sugestões de municípios"></div><datalist id="municipalitySuggestions" class="hidden"></datalist><small id="municipalityHint" style="display:block;color:var(--muted);margin-top:6px">Selecione uma UF para ver sugestões de municípios.</small><div id="batchSelectionPanel" class="batch-selection-panel hidden"><div class="batch-selection-heading"><strong id="batchSelectedCount">Nenhuma cidade selecionada</strong><button id="clearBatchCities" class="batch-clear-button" type="button">Limpar lista</button></div><div id="batchSelectedCities" class="batch-selected-list"></div></div></div><div class="field"><label for="cityObservation">Observação (opcional)</label><input id="cityObservation" maxlength="300" placeholder="Ex.: Atendimento somente às terças"></div><div class="field"><label id="cityBranchLabel" for="cityBranch">Filial cadastrada responsável</label><select id="cityBranch" required><option value="">Selecione uma filial cadastrada</option></select><small id="cityBranchBatchHint" class="batch-branch-hint hidden">Com “Não”, cada cidade usa a filial escolhida no próprio item. A filial acima serve como sugestão inicial para novas cidades.</small><div id="batchBranchApplyControls" class="batch-apply-all hidden" aria-label="Aplicação de filial em lote"><strong>Aplicar esta filial a todas as cidades selecionadas?</strong><div class="batch-apply-buttons"><button id="batchApplyBranchNo" type="button" aria-pressed="true">Não</button><button id="batchApplyBranchYes" type="button" aria-pressed="false">Sim</button></div></div></div><div class="field"><label for="cityDeliveryDays">Prazo / modalidade</label><select id="cityDeliveryDays" required><option value="7">7 dias úteis</option><option value="9">9 dias úteis</option><option value="10">10 dias úteis</option><option value="12">12 dias úteis</option><option value="15">15 dias úteis</option><option value="18">18 dias úteis</option><option value="retirada">Retirada na filial (sem prazo de entrega)</option></select></div><div class="field"><label for="cityRedespacho">É redespacho?</label><select id="cityRedespacho" required><option value="nao">Não</option><option value="sim">Sim</option></select></div><div id="cityLastModified" class="city-last-modified hidden" role="status" aria-live="polite"></div><button class="primary" id="saveCity" type="submit">Cadastrar cidade</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelCityEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas — toque para ver as cidades</div><div id="cityList" class="list"></div></section></div><section id="usersTab" class="hidden">
   <div class="section-title">Meu nome de administrador</div>
   <p class="user-form-note">Altere o nome que será identificado nos registros de manutenção das cidades.</p>
   <form id="adminProfileForm" autocomplete="off">
@@ -212,7 +222,7 @@ body.apk-webview .field select{
   </div>
   <div id="adminUsersList" class="admin-users-list" aria-live="polite"><p class="user-form-note">Abra esta aba para carregar os usuários autorizados.</p></div>
 </section><p class="footer">UNIÃO TRANSPORTES · Consulta interna de atendimento</p></main><script>
-if(location.pathname==="/"||location.pathname==="/index.html"){const adminButton=document.getElementById("openSettings");if(adminButton)adminButton.remove();const noMatch=document.getElementById("noMatch");if(noMatch)noMatch.innerHTML="Não encontramos essa cidade no cadastro. Confira a escrita ou entre em contato com a União Transportes.";}const SUPABASE_URL="https://ioxxlfcygmkrktesocqn.supabase.co";const SUPABASE_KEY="sb_publishable_dQ7zjxVT2nlCHnnHurg1ZQ_J6irE9Kp";let adminAccessToken=null;let adminRefreshToken=null;let adminIsAdmin=false;let currentAdminName='';let currentAdminEmail='';const apiHeaders={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};async function dbRequest(path,options={}){const authHeaders=adminAccessToken?{"Authorization":"Bearer "+adminAccessToken}:{};const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers:{...apiHeaders,...authHeaders,...(options.headers||{})}});const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!response.ok)throw new Error(data?.message||data?.details||("Supabase HTTP "+response.status+": "+raw.slice(0,240)));return data}let remoteReady=false;let records=[];const $=id=>document.getElementById(id);const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('pt-BR');let saveInProgress=false;let confirmedRecords=[];let batchMode=false;let batchSelectedCities=[];let batchSelectedUf="";const cloneRecords=list=>list.map(r=>({...r,cities:[...r.cities],citySettings:{...(r.citySettings||{})}}));const save=async()=>{
+if(location.pathname==="/"||location.pathname==="/index.html"){const adminButton=document.getElementById("openSettings");if(adminButton)adminButton.remove();const noMatch=document.getElementById("noMatch");if(noMatch)noMatch.innerHTML="Não encontramos essa cidade no cadastro. Confira a escrita ou entre em contato com a União Transportes.";}const SUPABASE_URL="https://ioxxlfcygmkrktesocqn.supabase.co";const SUPABASE_KEY="sb_publishable_dQ7zjxVT2nlCHnnHurg1ZQ_J6irE9Kp";let adminAccessToken=null;let adminRefreshToken=null;let adminIsAdmin=false;let currentAdminName='';let currentAdminEmail='';const apiHeaders={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};async function dbRequest(path,options={}){const authHeaders=adminAccessToken?{"Authorization":"Bearer "+adminAccessToken}:{};const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers:{...apiHeaders,...authHeaders,...(options.headers||{})}});const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!response.ok)throw new Error(data?.message||data?.details||("Supabase HTTP "+response.status+": "+raw.slice(0,240)));return data}let remoteReady=false;let records=[];const $=id=>document.getElementById(id);const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('pt-BR');let saveInProgress=false;let confirmedRecords=[];let batchMode=false;let batchSelectedCities=[];let batchSelectedUf="";let batchApplyBranchAll=false;const cloneRecords=list=>list.map(r=>({...r,cities:[...r.cities],citySettings:{...(r.citySettings||{})}}));const save=async()=>{
  if(saveInProgress){alert('Já existe uma gravação em andamento. Aguarde a conclusão.');return false}
  if(!remoteReady){alert('Os dados compartilhados ainda não foram carregados. Atualize a página e tente novamente antes de editar.');return false}
  saveInProgress=true;
@@ -287,6 +297,16 @@ function showCityAudit(cfg){
  box.textContent=message;
  box.classList.toggle('hidden',!message);
 }
+function setBatchApplyBranchAll(enabled){
+ batchApplyBranchAll=!!enabled;
+ $('batchApplyBranchNo').setAttribute('aria-pressed',String(!batchApplyBranchAll));
+ $('batchApplyBranchYes').setAttribute('aria-pressed',String(batchApplyBranchAll));
+ $('cityBranch').required=!batchMode||batchApplyBranchAll;
+ $('cityBranchBatchHint').textContent=batchApplyBranchAll
+  ?'Modo SIM: a filial selecionada acima será aplicada a todas as cidades do lote. As escolhas individuais serão ignoradas.'
+  :'Modo NÃO: cada cidade usa a filial escolhida no próprio item. A filial acima serve como sugestão inicial para novas cidades.';
+ renderBatchSelectedCities();
+}
 function renderBatchSelectedCities(){
  const panel=$('batchSelectionPanel'),list=$('batchSelectedCities');
  if(!panel||!list)return;
@@ -297,12 +317,48 @@ function renderBatchSelectedCities(){
  if(!count){const p=document.createElement('p');p.className='batch-empty';p.textContent='Pesquise ou digite cidades para adicioná-las a esta lista.';list.append(p)}
  batchSelectedCities.forEach((item,index)=>{
   const row=document.createElement('div');row.className='batch-selected-item';
-  const details=document.createElement('div'),name=document.createElement('strong'),small=document.createElement('small');
-  name.textContent=item.name;
+  const details=document.createElement('div'),toggle=document.createElement('button'),small=document.createElement('small');
   const existing=findExistingCityRecords(item.name,item.uf);
-  const existingBranches=[...new Set(existing.map(record=>record.branchName).filter(Boolean))];
-  small.textContent=existing.length?('Atendida por: '+(existingBranches.join(', ')||'filial não identificada')+' · '+existing.length+' vínculo(s) existente(s) · as regras serão atualizadas'):'Cidade nova · será cadastrada na filial escolhida';
-  details.append(name,small);
+  const existingBranches=[...new Map(existing.map(record=>[record.branchId,record.branchName])).entries()];
+  const chosenBranch=records.find(record=>record.id===item.branchId);
+  toggle.type='button';toggle.className='batch-city-toggle';toggle.setAttribute('aria-expanded',String(!!item.expanded));
+  toggle.textContent=item.name+(item.expanded?'  ▴':'  ▾');
+  if(batchApplyBranchAll){
+   const globalBranch=records.find(record=>record.id===$('cityBranch').value);
+   small.textContent=globalBranch?'Filial aplicada a todas: '+globalBranch.name:'Selecione a filial global acima.';
+  }else if(item.branchId==='__keep__'){
+   small.textContent='Filiais atuais preservadas: '+(existingBranches.map(x=>x[1]).join(', ')||'não identificadas');
+  }else if(chosenBranch){
+   small.textContent=existing.length?'Filial selecionada: '+chosenBranch.name+(existingBranches.length>1?' · substituirá os demais vínculos':''):'Cidade nova · será cadastrada em '+chosenBranch.name;
+  }else{
+   small.textContent=existing.length?'Escolha uma filial para esta cidade. Filial(is) atual(is): '+(existingBranches.map(x=>x[1]).join(', ')||'não identificada'):'Cidade nova · escolha a filial para cadastrar';
+  }
+  toggle.onclick=()=>{item.expanded=!item.expanded;renderBatchSelectedCities()};
+  details.append(toggle,small);
+  if(item.expanded){
+   const editor=document.createElement('div');editor.className='batch-city-editor';
+   const label=document.createElement('label');label.textContent='Filial responsável por '+item.name;
+   const select=document.createElement('select');select.className='batch-branch-select';select.setAttribute('aria-label','Filial responsável por '+item.name);
+   if(existingBranches.length>1){
+    const keep=document.createElement('option');keep.value='__keep__';keep.textContent='Manter filiais atuais: '+existingBranches.map(x=>x[1]).join(', ');select.append(keep);
+   }else if(!existingBranches.length){
+    const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Selecione a filial desta cidade';select.append(placeholder);
+   }
+   records.forEach(record=>{const option=document.createElement('option');option.value=record.id;option.textContent=record.name;select.append(option)});
+   select.value=item.branchId||'';
+   if(select.value!==String(item.branchId||''))select.value='';
+   select.disabled=batchApplyBranchAll;
+   select.onchange=()=>{item.branchId=select.value;renderBatchSelectedCities()};
+   const note=document.createElement('small');note.className='batch-individual-note';
+   note.textContent=batchApplyBranchAll
+    ?'Esta escolha individual está desativada porque a filial global será aplicada a todas as cidades.'
+    :existing.length>1
+      ?'“Manter filiais atuais” preserva todos os vínculos. Escolher uma filial específica transfere a cidade para ela.'
+      :existing.length
+        ?'A filial atual já está selecionada. Escolher outra transfere a cidade para a nova filial.'
+        :'Escolha a filial que atenderá esta cidade.';
+   editor.append(label,select,note);details.append(editor);
+  }
   const remove=document.createElement('button');remove.type='button';remove.className='batch-remove-button';remove.textContent='Remover';remove.setAttribute('aria-label','Remover '+item.name+' da seleção');
   remove.onclick=()=>{batchSelectedCities.splice(index,1);renderBatchSelectedCities();renderMunicipalityOptions()};
   row.append(details,remove);list.append(row);
@@ -321,29 +377,33 @@ function addBatchCity(value){
   $('cityName').value='';$('municipalityOptions').innerHTML='';return;
  }
  batchSelectedUf=uf;
- batchSelectedCities.push({name,uf});
- $('cityName').value='';$('municipalityOptions').innerHTML='';
  const existing=findExistingCityRecords(name,uf);
- $('municipalityHint').textContent=name+' adicionada. '+batchSelectedCities.length+' cidade(s) na seleção.'+(existing.length?' As regras existentes serão atualizadas.':' Será cadastrada na filial escolhida.');
+ const defaultBranch=existing.length===1?existing[0].branchId:existing.length>1?'__keep__':$('cityBranch').value||'';
+ batchSelectedCities.push({name,uf,branchId:defaultBranch,expanded:existing.length===0});
+ $('cityName').value='';$('municipalityOptions').innerHTML='';
+ $('municipalityHint').textContent=name+' adicionada. '+batchSelectedCities.length+' cidade(s) na seleção.'+(existing.length?' A filial atual será mantida por padrão; toque no nome para conferir ou alterar.':' Escolha a filial no item recém-adicionado.');
  renderBatchSelectedCities();$('cityName').focus();
 }
 function setBatchMode(enabled,force=false){
  if(enabled&&!batchMode){
   if($('editingCityKey').value){alert('Cancele ou conclua a edição individual antes de iniciar um lote.');return}
   const pending=$('cityName').value.trim();
-  batchMode=true;batchSelectedCities=[];batchSelectedUf=$('cityUf').value||'';
+  batchMode=true;batchSelectedCities=[];batchSelectedUf=$('cityUf').value||'';batchApplyBranchAll=false;
   $('toggleBatchMode').textContent='Voltar ao cadastro individual';
-  $('batchModeHelp').classList.remove('hidden');$('batchAddRow').classList.remove('hidden');$('cityBranchBatchHint').classList.remove('hidden');
+  $('batchModeHelp').classList.remove('hidden');$('batchAddRow').classList.remove('hidden');$('cityBranchBatchHint').classList.remove('hidden');$('batchBranchApplyControls').classList.remove('hidden');
   $('cityNameLabel').textContent='Adicionar cidades à lista';$('cityName').required=false;$('cityName').placeholder='Digite ou escolha uma cidade da UF selecionada';
   $('cityBranchLabel').textContent='Filial para cadastrar cidades novas';
+  $('cityBranch').required=false;
+  setBatchApplyBranchAll(false);
   if(pending)addBatchCity(pending);
  }else if(!enabled&&batchMode){
   if(!force&&batchSelectedCities.length&&!confirm('Sair do modo em lote e descartar as '+batchSelectedCities.length+' cidades selecionadas?'))return;
-  batchMode=false;batchSelectedCities=[];batchSelectedUf='';
+  batchMode=false;batchSelectedCities=[];batchSelectedUf='';batchApplyBranchAll=false;
   $('toggleBatchMode').textContent='Alteração em lote';
-  $('batchModeHelp').classList.add('hidden');$('batchAddRow').classList.add('hidden');$('cityBranchBatchHint').classList.add('hidden');
+  $('batchModeHelp').classList.add('hidden');$('batchAddRow').classList.add('hidden');$('cityBranchBatchHint').classList.add('hidden');$('batchBranchApplyControls').classList.add('hidden');
   $('cityNameLabel').textContent='Nome da cidade';$('cityName').required=true;$('cityName').placeholder='Escolha a UF e digite a cidade';
-  $('cityBranchLabel').textContent='Filial cadastrada responsável';
+  $('cityBranchLabel').textContent='Filial cadastrada responsável';$('cityBranch').required=true;
+  $('batchApplyBranchNo').setAttribute('aria-pressed','true');$('batchApplyBranchYes').setAttribute('aria-pressed','false');
   $('cityName').value='';$('municipalityOptions').innerHTML='';
  }
  $('toggleBatchMode').setAttribute('aria-pressed',String(batchMode));
@@ -352,55 +412,79 @@ function setBatchMode(enabled,force=false){
 }
 async function saveCityBatch(){
  if(!remoteReady){alert('Os dados compartilhados ainda não foram carregados. Atualize a página e tente novamente.');return}
- const uf=$('cityUf').value,branchId=$('cityBranch').value,deliveryDays=$('cityDeliveryDays').value,redespacho=$('cityRedespacho').value,observation=$('cityObservation').value.trim();
+ const uf=$('cityUf').value,globalBranchId=$('cityBranch').value,applyAll=batchApplyBranchAll,deliveryDays=$('cityDeliveryDays').value,redespacho=$('cityRedespacho').value,observation=$('cityObservation').value.trim();
  if(!uf)return alert('Selecione a UF das cidades.');
  if(!batchSelectedCities.length)return alert('Adicione pelo menos uma cidade à lista antes de salvar.');
- const selectedBranch=records.find(r=>r.id===branchId);
- if(!selectedBranch)return alert('Selecione a filial para cadastrar as cidades novas.');
- const working=cloneRecords(records),target=working.find(r=>r.id===branchId);
- const conflicts=[],plans=[];
+ const globalBranch=records.find(r=>r.id===globalBranchId);
+ if(applyAll&&!globalBranch)return alert('No modo “Sim”, selecione a filial que será aplicada a todas as cidades.');
+ const working=cloneRecords(records),conflicts=[],plans=[];
  for(const item of batchSelectedCities){
-  const key=norm(item.name),matches=[];
-  let targetSame=null;
-  working.forEach(r=>{
-   const saved=(r.cities||[]).find(city=>norm(city)===key);
+  const key=norm(item.name),namedMatches=[];
+  working.forEach(record=>{
+   const saved=(record.cities||[]).find(city=>norm(city)===key);
    if(!saved)return;
-   const cfg=cityConfig(r,saved);
-   if(r.id===branchId)targetSame={saved,cfg};
-   if(!cfg.uf||cfg.uf===uf)matches.push({record:r,city:saved});
+   const cfg=cityConfig(record,saved);
+   namedMatches.push({branchId:record.id,city:saved,cfg});
   });
-  if(targetSame&&targetSame.cfg.uf&&targetSame.cfg.uf!==uf){conflicts.push(item.name+' (já cadastrada como '+targetSame.cfg.uf+')');continue}
-  if(matches.length)plans.push({name:item.name,key,kind:'update',matches});
-  else if(targetSame)conflicts.push(item.name+' (já existe na filial selecionada)');
-  else plans.push({name:item.name,key,kind:'new',matches:[]});
+  const matches=namedMatches.filter(match=>!match.cfg.uf||match.cfg.uf===uf);
+  const targetBranchId=applyAll?globalBranchId:item.branchId;
+  if(!applyAll&&targetBranchId==='__keep__'){
+   if(!matches.length){conflicts.push(item.name+' (não há filial atual para manter nesta UF)');continue}
+   plans.push({name:item.name,key,mode:'keep',matches});
+   continue;
+  }
+  if(!targetBranchId){conflicts.push(item.name+' (selecione uma filial no próprio item da cidade)');continue}
+  const targetBranch=working.find(record=>record.id===targetBranchId);
+  if(!targetBranch){conflicts.push(item.name+' (a filial selecionada não está disponível)');continue}
+  const targetSame=namedMatches.find(match=>match.branchId===targetBranchId);
+  if(targetSame&&targetSame.cfg.uf&&targetSame.cfg.uf!==uf){
+   conflicts.push(item.name+' (já cadastrada na filial escolhida como '+targetSame.cfg.uf+')');continue;
+  }
+  plans.push({name:item.name,key,mode:matches.length?'move':'new',matches,targetBranchId});
  }
  if(conflicts.length){
-  alert('Não foi possível aplicar o lote. Confira estas cidades, que já estão cadastradas na filial escolhida com outra UF ou cadastro incompatível:\n\n'+conflicts.join('\n')+'\n\nNenhuma alteração foi salva.');
+  alert('Não foi possível aplicar o lote. Confira as filiais e os cadastros incompatíveis destas cidades:\n\n'+conflicts.join('\n')+'\n\nNenhuma alteração foi salva.');
   return;
  }
- const added=plans.filter(x=>x.kind==='new').length,updated=plans.filter(x=>x.kind==='update').length;
- const confirmMessage='Confirmar alteração em lote?\n\nUF: '+uf+'\nCidades selecionadas: '+plans.length+'\nNovas: '+added+'\nJá cadastradas (regras atualizadas): '+updated+'\n\nAs cidades existentes manterão seus vínculos atuais com as filiais. As novas serão cadastradas em '+selectedBranch.name+'.';
+ const added=plans.filter(plan=>plan.mode==='new').length;
+ const updated=plans.filter(plan=>plan.mode!=='new').length;
+ const moved=plans.filter(plan=>plan.mode==='move').length;
+ const ruleText=applyAll
+  ?'A filial '+globalBranch.name+' será aplicada a todas as cidades, substituindo os vínculos atuais.'
+  :'As filiais serão definidas por cidade. As cidades com “Manter filiais atuais” conservarão todos os vínculos existentes.';
+ const confirmMessage='Confirmar alteração em lote?\n\nUF: '+uf+'\nCidades selecionadas: '+plans.length+'\nNovas: '+added+'\nJá cadastradas: '+updated+'\nTransferidas para outra filial: '+moved+'\n\n'+ruleText;
  if(!confirm(confirmMessage))return;
  const audit={lastModifiedBy:String(currentAdminName||currentAdminEmail||'Usuário').trim(),lastModifiedAt:new Date().toISOString()};
+ const applySettings=(record,plan)=>{
+  if(!record.cities.some(city=>norm(city)===plan.key))record.cities.push(plan.name);
+  const settings={...(record.citySettings||{})},previous=settings[plan.key]||{};
+  settings[plan.key]={...previous,deliveryDays,redespacho,observation,uf,...audit};
+  record.citySettings=settings;
+ };
  for(const plan of plans){
-  if(plan.kind==='update'){
+  if(plan.mode==='keep'){
    plan.matches.forEach(match=>{
-    const savedKey=norm(match.city),settings={...(match.record.citySettings||{})},previous=settings[savedKey]||{};
-    settings[savedKey]={...previous,deliveryDays,redespacho,observation,uf,...audit};
-    match.record.citySettings=settings;
+    const record=working.find(item=>item.id===match.branchId);
+    if(record)applySettings(record,plan);
    });
-  }else{
-   target.cities.push(plan.name);
-   const settings={...(target.citySettings||{})},previous=settings[plan.key]||{};
-   settings[plan.key]={...previous,deliveryDays,redespacho,observation,uf,...audit};
-   target.citySettings=settings;
+   continue;
   }
+  if(plan.mode==='move'){
+   plan.matches.forEach(match=>{
+    const record=working.find(item=>item.id===match.branchId);
+    if(!record)return;
+    record.cities=record.cities.filter(city=>norm(city)!==plan.key);
+    const settings={...(record.citySettings||{})};delete settings[plan.key];record.citySettings=settings;
+   });
+  }
+  const target=working.find(record=>record.id===plan.targetBranchId);
+  if(target)applySettings(target,plan);
  }
  records=working;
  const saved=await save();
  if(!saved)return;
  resetCityForm();switchTab('cities');
- alert('Lote salvo com sucesso!\n\n'+added+' cidade(s) cadastrada(s).\n'+updated+' cidade(s) já existente(s) atualizada(s).');
+ alert('Lote salvo com sucesso!\n\n'+added+' cidade(s) cadastrada(s).\n'+updated+' cidade(s) já existente(s) atualizada(s).\n'+moved+' cidade(s) transferida(s) para outra filial.');
 }
 function editCity(branchId,city,selectedUf=''){if(batchMode){alert('Saia do modo em lote para editar uma cidade individualmente.');return}const r=records.find(x=>x.id===branchId);if(!r)return;const cfg=cityConfig(r,city);$('editingCityKey').value=city;$('editingCityBranch').value=branchId;$('cityName').value=city;$('cityUf').value=cfg.uf||selectedUf;$('cityObservation').value=cfg.observation;updateMunicipalitySuggestions();$('cityBranch').value=branchId;$('cityDeliveryDays').value=String(cfg.deliveryDays);$('cityRedespacho').value=cfg.redespacho;showCityAudit(cfg);$('saveCity').textContent='Salvar alterações';$('cancelCityEdit').classList.remove('hidden');$('cityName').focus();$('cityForm').scrollIntoView({behavior:'smooth',block:'start'})}
 function resetCityForm(){setBatchMode(false,true);$('cityForm').reset();$('editingCityKey').value='';$('editingCityBranch').value='';showCityAudit(null);$('saveCity').textContent='Cadastrar cidade';$('cancelCityEdit').classList.add('hidden');updateMunicipalitySuggestions()}
