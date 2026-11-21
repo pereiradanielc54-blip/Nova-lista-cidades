@@ -403,30 +403,42 @@ const monthDay=key.slice(5);
 return stateHolidays[uf]?.[monthDay]||null}
 function calculateBusinessDeadline(startDate,businessDays,uf){let cursor=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate()),counted=0;const holidays=[];let safety=0;while(counted<businessDays&&safety<1500){cursor=addCalendarDays(cursor,1);safety++;const weekday=cursor.getDay();if(weekday===0||weekday===6)continue;const holiday=getHolidayName(cursor,uf);if(holiday){holidays.push({date:new Date(cursor),name:holiday});continue}counted++}if(counted!==businessDays)throw new Error('Não foi possível calcular o prazo informado.');return {date:cursor,holidays}}
 function buildDeadlineCalculator(f,uf){const wrap=document.createElement('div');wrap.className='deadline-calculator';const toggle=document.createElement('button');toggle.type='button';toggle.className='deadline-calc-button';toggle.textContent='🗓️ Calculadora de prazo';toggle.setAttribute('aria-expanded','false');const panel=document.createElement('div');panel.className='deadline-calc-panel hidden';const label=document.createElement('label');const input=document.createElement('input');input.type='date';input.className='deadline-date-input';input.value=localDateInputValue();input.max='';const inputId='deadlineDate'+(++deadlineCalculatorSequence);input.id=inputId;label.htmlFor=inputId;label.textContent='Data em que a mercadoria entrou no galpão';const help=document.createElement('small');help.className='deadline-help';help.textContent='A data de entrada não é contada. O prazo começa no próximo dia útil. São considerados feriados nacionais e estaduais; pontos facultativos e feriados municipais não entram automaticamente.';const output=document.createElement('div');output.className='deadline-summary';output.setAttribute('aria-live','polite');panel.append(label,input,help,output);wrap.append(toggle,panel);
-function update(){output.replaceChildren();const startDate=parseLocalDate(input.value);if(!startDate){output.textContent='Selecione uma data válida para calcular a previsão.';return}const days=Number.parseInt(f.deliveryDays,10);if(!Number.isInteger(days)||days<1){output.textContent='O prazo desta cidade não está cadastrado corretamente.';return}let result;try{result=calculateBusinessDeadline(startDate,days,uf||f.uf||'')}catch(error){output.textContent=error.message||'Não foi possível calcular o prazo.';return}const title=document.createElement('strong');title.textContent='PREVISÃO DE ENTREGA';const date=document.createElement('span');date.className='deadline-date-result';date.textContent=formatDateBR(result.date);const detail=document.createElement('p');detail.textContent=days+' dias úteis a partir do próximo dia útil após a entrada no galpão.';output.append(title,date,detail);if(result.holidays.length){const note=document.createElement('div');note.className='deadline-holidays';const noteTitle=document.createElement('strong');noteTitle.textContent='Feriado(s) que estenderam o prazo';const list=document.createElement('ul');result.holidays.forEach(item=>{const li=document.createElement('li');li.textContent=formatDateBR(item.date)+' — '+item.name;list.append(li)});note.append(noteTitle,list);output.append(note)}const copy=document.createElement('button');copy.type='button';copy.className='deadline-copy-result';copy.textContent='Copiar previsão completa';copy.addEventListener('click',async()=>{const lines=['PREVISÃO DE ENTREGA — UNIÃO TRANSPORTES','Cidade: '+city+(uf?' - '+uf:''),'Filial responsável: '+f.branch,'Prazo cadastrado: '+days+' dias úteis','Data de entrada no galpão: '+formatDateBR(startDate),'Previsão de entrega: '+formatDateBR(result.date),'Redespacho: '+(f.redespacho==='sim'?'Sim':'Não')];if(String(f.observation||'').trim())lines.push('Observação: '+String(f.observation).trim());if(result.holidays.length){lines.push('Feriado(s) que estenderam o prazo:');result.holidays.forEach(item=>lines.push(formatDateBR(item.date)+' — '+item.name))}try{
+function update(){output.replaceChildren();const startDate=parseLocalDate(input.value);if(!startDate){output.textContent='Selecione uma data válida para calcular a previsão.';return}const days=Number.parseInt(f.deliveryDays,10);if(!Number.isInteger(days)||days<1){output.textContent='O prazo desta cidade não está cadastrado corretamente.';return}let result;try{result=calculateBusinessDeadline(startDate,days,uf||f.uf||'')}catch(error){output.textContent=error.message||'Não foi possível calcular o prazo.';return}const title=document.createElement('strong');title.textContent='PREVISÃO DE ENTREGA';const date=document.createElement('span');date.className='deadline-date-result';date.textContent=formatDateBR(result.date);const detail=document.createElement('p');detail.textContent=days+' dias úteis a partir do próximo dia útil após a entrada no galpão.';output.append(title,date,detail);if(result.holidays.length){const note=document.createElement('div');note.className='deadline-holidays';const noteTitle=document.createElement('strong');noteTitle.textContent='Feriado(s) que estenderam o prazo';const list=document.createElement('ul');result.holidays.forEach(item=>{const li=document.createElement('li');li.textContent=formatDateBR(item.date)+' — '+item.name;list.append(li)});note.append(noteTitle,list);output.append(note)}const copy=document.createElement('button');copy.type='button';copy.className='deadline-copy-result';copy.textContent='Copiar previsão completa';copy.addEventListener('click',async()=>{
+const lines=[
+  'Previsão de entrega: '+formatDateBR(result.date),
+  'Prazo: '+days+' dias úteis',
+  'Data de entrada no galpão: '+formatDateBR(startDate)
+];
+if(result.holidays.length){
+  lines.push('Feriados que estenderam o prazo:');
+  result.holidays.forEach(item=>lines.push(formatDateBR(item.date)+' — '+item.name));
+}
 const textToCopy=lines.join('\n');
-let copied=false;
-if(navigator.clipboard&&window.isSecureContext){
-  try{await navigator.clipboard.writeText(textToCopy);copied=true}catch(error){console.warn('Clipboard API indisponível; tentando alternativa.',error)}
+try{
+  if(navigator.clipboard&&window.isSecureContext){
+    await navigator.clipboard.writeText(textToCopy);
+  }else{
+    const area=document.createElement('textarea');
+    area.value=textToCopy;
+    area.readOnly=true;
+    area.setAttribute('aria-hidden','true');
+    area.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;padding:0;border:0;opacity:0.01;z-index:-1;font-size:16px';
+    document.body.appendChild(area);
+    area.focus({preventScroll:true});
+    area.select();
+    area.setSelectionRange(0,area.value.length);
+    const copied=document.execCommand('copy');
+    area.blur();
+    area.remove();
+    if(!copied)throw new Error('O navegador bloqueou a cópia.');
+  }
+  copy.textContent='Previsão copiada!';
+}catch(error){
+  console.error('Falha ao copiar somente os dados da previsão:',error);
+  copy.textContent='Não foi possível copiar';
 }
-if(!copied){
-  const area=document.createElement('textarea');
-  area.value=textToCopy;
-  area.setAttribute('readonly','');
-  area.style.position='fixed';
-  area.style.top='0';
-  area.style.left='-9999px';
-  area.style.opacity='0';
-  document.body.append(area);
-  area.focus();
-  area.select();
-  area.setSelectionRange(0,area.value.length);
-  copied=document.execCommand('copy');
-  area.remove();
-}
-if(!copied)throw new Error('O navegador bloqueou a cópia.');
-copy.textContent='Previsão copiada!';
-}catch(error){console.error('Falha ao copiar previsão completa:',error);copy.textContent='Não foi possível copiar'}setTimeout(()=>copy.textContent='Copiar previsão completa',1800)});output.append(copy)}
+setTimeout(()=>copy.textContent='Copiar previsão completa',1800)
+};output.append(copy)}
 toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));if(opening)update()});input.addEventListener('change',update);return wrap}
 let deadlineCalculatorSequence=0;
 function showCity(city,uf=''){const found=allCities().filter(x=>norm(x.city)===norm(city)&&(!uf||!x.uf||x.uf===uf)),box=$('result');box.classList.remove('hidden');$('noMatch').classList.add('hidden');$('coverageWarning').classList.add('hidden');box.innerHTML='';const label=document.createElement('div');label.className='label';label.textContent=found.length>1?'Atenção · mais de uma filial cadastrada':'Filial responsável';const h=document.createElement('h2');h.textContent=city+(uf?' - '+uf:'');const p=document.createElement('p');p.textContent=found.length>1?'Encontramos mais de uma associação para esta cidade:':'Cidade localizada no cadastro.';box.append(label,h,p);found.forEach(f=>{const b=document.createElement('div');b.className='branch';const i=document.createElement('div');i.className='branch-icon';i.textContent='↗';const d=document.createElement('div'),s=document.createElement('strong'),sm=document.createElement('small');s.textContent=f.branch;sm.textContent='Previsão: '+f.deliveryDays+' dias · Redespacho: '+(f.redespacho==='sim'?'Sim':'Não');d.append(s,sm);b.append(i,d);box.append(b);if(String(f.observation||'').trim()){const note=document.createElement('div');note.className='city-observation-card';const icon=document.createElement('div');icon.className='city-observation-icon';icon.textContent='ℹ';const body=document.createElement('div');body.className='city-observation-body';const title=document.createElement('strong');title.textContent='Observação';const message=document.createElement('p');message.textContent=String(f.observation).trim();body.append(title,message);note.append(icon,body);box.append(note)}box.append(buildDeadlineCalculator(f,uf||f.uf||''))})}
