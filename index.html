@@ -443,11 +443,13 @@ const shareCard=document.createElement('button');shareCard.type='button';shareCa
 shareCard.addEventListener('click',async()=>{
  const original=shareCard.textContent;shareCard.disabled=true;shareCard.textContent='Preparando cartão…';
  try{
-  const canvas=document.createElement('canvas');canvas.width=900;canvas.height=560;
+  const holidayLines=(result.holidays||[]).map(item=>formatDateBR(item.date)+' — '+item.name);
+  const canvasHeight=holidayLines.length?640+holidayLines.length*30:560;
+  const canvas=document.createElement('canvas');canvas.width=900;canvas.height=canvasHeight;
   const ctx=canvas.getContext('2d');
-  const bg=ctx.createLinearGradient(0,0,900,560);bg.addColorStop(0,'#06172d');bg.addColorStop(.55,'#0b3150');bg.addColorStop(1,'#06434a');ctx.fillStyle=bg;ctx.fillRect(0,0,900,560);
-  const glow=ctx.createRadialGradient(760,70,10,760,70,430);glow.addColorStop(0,'rgba(73,226,255,.28)');glow.addColorStop(1,'rgba(73,226,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,900,560);
-  ctx.strokeStyle='rgba(116,224,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(24,24,852,512,30);ctx.stroke();
+  const bg=ctx.createLinearGradient(0,0,900,canvasHeight);bg.addColorStop(0,'#06172d');bg.addColorStop(.55,'#0b3150');bg.addColorStop(1,'#06434a');ctx.fillStyle=bg;ctx.fillRect(0,0,900,canvasHeight);
+  const glow=ctx.createRadialGradient(760,70,10,760,70,430);glow.addColorStop(0,'rgba(73,226,255,.28)');glow.addColorStop(1,'rgba(73,226,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,900,canvasHeight);
+  ctx.strokeStyle='rgba(116,224,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(24,24,852,canvasHeight-48,30);ctx.stroke();
   ctx.fillStyle='#dff7ff';ctx.beginPath();ctx.roundRect(58,54,58,58,17);ctx.fill();ctx.fillStyle='#087bb4';ctx.font='900 36px Arial';ctx.textAlign='center';ctx.fillText('T',87,94);
   ctx.textAlign='left';ctx.fillStyle='#f0faff';ctx.font='800 26px Arial';ctx.fillText('UNIÃO TRANSPORTES',136,80);ctx.fillStyle='#91b9d7';ctx.font='15px Arial';ctx.fillText('CONSULTA DE CIDADES',136,105);
   ctx.fillStyle='#78e7ff';ctx.font='700 16px Arial';ctx.fillText('PREVISÃO DE ENTREGA',62,174);
@@ -457,7 +459,15 @@ shareCard.addEventListener('click',async()=>{
   ctx.fillStyle='#ffffff';ctx.font='800 58px Arial';ctx.fillText(formatDateBR(result.date),64,405);
   ctx.fillStyle='#a9dff5';ctx.font='700 18px Arial';ctx.fillText('PRAZO DE ENTREGA',64,462);
   ctx.fillStyle='#ffffff';ctx.font='700 26px Arial';ctx.fillText(days+' dias úteis',64,500);
-  ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.textAlign='right';ctx.fillText('Previsão calculada conforme calendário de dias úteis',838,510);
+  let footerY=510;
+  if(holidayLines.length){
+   ctx.strokeStyle='rgba(145,211,240,.30)';ctx.beginPath();ctx.moveTo(62,530);ctx.lineTo(838,530);ctx.stroke();
+   ctx.textAlign='left';ctx.fillStyle='#ffd98a';ctx.font='700 18px Arial';ctx.fillText('PRAZO ESTENDIDO POR FERIADO(S)',64,568);
+   ctx.fillStyle='#f4f8ff';ctx.font='16px Arial';
+   holidayLines.forEach((line,index)=>{let shown=line;while(ctx.measureText('• '+shown).width>760&&shown.length>12)shown=shown.slice(0,-2)+'…';ctx.fillText('• '+shown,68,602+index*30)});
+   footerY=canvasHeight-30;
+  }
+  ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.textAlign='right';ctx.fillText('Previsão calculada considerando feriados e dias úteis',838,footerY);
   const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('Falha ao gerar imagem')),'image/png'));
   const file=new File([blob],'previsao-entrega-'+norm(city||'cidade').replace(/[^a-z0-9]+/g,'-')+'.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Previsão de entrega · União Transportes',text:'Previsão de entrega para '+cityLabel,files:[file]});}
