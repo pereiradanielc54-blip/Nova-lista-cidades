@@ -730,4 +730,14 @@ main{padding-top:20px;padding-bottom:56px}
 @keyframes adminAmbient{0%{background-position:0% 20%}100%{background-position:100% 80%}}
 @media(max-width:650px){header,main{max-width:100%}.intro{padding:23px 19px;margin-top:18px}.settings-panel{padding:15px}.admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-overview-bottom{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.tab{font-size:12px;padding:10px 5px}}
 @media(prefers-reduced-motion:reduce){body:before{animation:none!important}}
-</style><style>html{min-height:100%;background:#030d1d}body{background:transparent;isolation:isolate}body:before{z-index:-1}body:after{z-index:-2}</style></body></html>
+</style><style>html{min-height:100%;background:#030d1d}body{background:transparent;isolation:isolate}body:before{z-index:-1}body:after{z-index:-2}</style><style>
+/* Correção definitiva: elimina as imagens rasterizadas/embutidas do cenário */
+html,body{min-height:100%;background:#030d1d!important}
+body:before,body.customer-web:before,body.apk-webview:before{
+ content:""!important;position:fixed!important;inset:0!important;z-index:-1!important;
+ background-image:radial-gradient(ellipse at 12% 8%,rgba(11,71,112,.34) 0%,transparent 38%),radial-gradient(ellipse at 88% 18%,rgba(24,62,139,.28) 0%,transparent 34%),radial-gradient(ellipse at 55% 95%,rgba(0,124,121,.22) 0%,transparent 38%),linear-gradient(145deg,#030b19 0%,#071a33 52%,#041426 100%)!important;
+ background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
+ animation:none!important;transform:none!important;filter:none!important;
+}
+body:after{pointer-events:none!important}
+</style></body></html>
