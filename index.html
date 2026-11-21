@@ -824,4 +824,41 @@ function startCityRegistryWatcher(){
 
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 (async()=>{await Promise.all([loadSharedRecords(),loadIbge()]);render();startCityRegistryWatcher()})();
-</script></body></html>
+</script><style>
+/* Redesign institucional — consulta pública */
+body{background:#030d1d;color:#f4f8ff}
+body:before{content:"";position:fixed;inset:0;z-index:-3;background:radial-gradient(ellipse at 12% 8%,#0b477055 0%,transparent 38%),radial-gradient(ellipse at 88% 18%,#183e8b55 0%,transparent 34%),radial-gradient(ellipse at 55% 95%,#007c7950 0%,transparent 38%),linear-gradient(145deg,#030b19 0%,#071a33 52%,#041426 100%);background-size:150% 150%;animation:publicAmbient 28s ease-in-out infinite alternate}
+body:after{opacity:.2;filter:blur(58px)}
+header,main{max-width:900px}
+header{padding-top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:18px}
+main{padding-top:20px;padding-bottom:56px}
+.intro{margin:26px 0 25px;padding:30px;border:1px solid #5acbff2e;border-radius:24px;background:linear-gradient(115deg,#0b2745dc,#0b2038c9 60%,#073a43a6);box-shadow:0 18px 54px #0003,inset 0 1px #ffffff12;backdrop-filter:blur(14px)}
+.intro h1{font-size:clamp(31px,5.5vw,48px);letter-spacing:-.05em}
+.search-card,.result,.empty{border-radius:20px;border-color:#47769a70;background:linear-gradient(145deg,#0b2038f5,#081a30f2);box-shadow:0 20px 56px #0004,inset 0 1px #ffffff0c;backdrop-filter:blur(16px)}
+.search-card{padding:clamp(18px,3vw,26px)}
+.lookup-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;border:1px solid #365876;border-radius:14px;background:#06162a;margin-bottom:18px}
+.lookup-mode{min-height:42px;border:0;border-radius:10px;background:transparent;color:#9fb8d0;font-weight:750;transition:background .2s,color .2s}
+.lookup-mode.active{background:linear-gradient(115deg,#124c78,#155c86 58%,#087d80);color:#fff;box-shadow:0 5px 16px #0003,inset 0 1px #ffffff20}
+.search-wrap input,.field input,.field select{border-radius:12px;background:#041327;border-color:#3d6281;min-height:48px}
+.clear,.primary{border-radius:12px;min-height:46px}
+.suggestions,.municipality-options{border-color:#3b6281;border-radius:14px}
+.suggestion,.municipality-option{padding:14px 15px}
+.result{padding:22px;margin-top:18px}
+.result h2{font-size:clamp(23px,4vw,30px);letter-spacing:-.025em}
+.branch{border:1px solid #3b6886;border-radius:14px;background:linear-gradient(110deg,#0a2b49,#0b263d);padding:15px}
+.branch-icon{flex:0 0 40px;width:40px;height:40px}
+.branch-observation{margin-top:10px;padding:10px 12px;border-left:2px solid #58cfff;background:#061a2e;border-radius:0 10px 10px 0}
+.branch-observation p{margin:5px 0 0;line-height:1.5}
+.map-toolbar{margin:12px 0 0}
+.map-trigger{min-height:44px;padding:11px 16px;border:1px solid #4c83a6;border-radius:12px;background:#0a2540;color:#e7f6ff;font-weight:750;transition:background .2s,border-color .2s}
+.map-trigger:hover{background:#103a5c;border-color:#69d7ff}
+.branches-map-panel{border:1px solid #47769a70;border-radius:20px;background:#081a30;padding:18px;margin-top:12px;box-shadow:0 20px 56px #0004}
+.map-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.map-heading h2{margin:6px 0;font-size:21px}
+.map-heading p{margin:0;color:#a9c0d5;font-size:13px;line-height:1.5}
+#branchesMap{border-radius:14px;overflow:hidden}
+.footer{color:#86a8c7}
+@keyframes publicAmbient{0%{background-position:0% 20%}100%{background-position:100% 80%}}
+@media(max-width:600px){header,main{max-width:100%}.intro{padding:23px 19px;margin-top:18px}.search-wrap{gap:7px}.clear{padding:10px 12px}.map-heading{flex-direction:column}.map-heading .close{align-self:flex-end}}
+@media(prefers-reduced-motion:reduce){body:before{animation:none!important}}
+</style></body></html>
