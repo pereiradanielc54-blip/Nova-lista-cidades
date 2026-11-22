@@ -223,6 +223,7 @@ body.apk-webview .field select{
     <div class="cep-feedback hidden" id="cepFeedback" role="status" aria-live="polite"></div>
   </div>
 </section>
+<section id="result" class="result hidden" aria-live="polite"></section><section id="noMatch" class="empty hidden">Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.</section><section id="coverageWarning" class="coverage-warning hidden" aria-live="polite"></section>
 <div class="map-toolbar">
   <button class="map-trigger" id="openBranchesMap" type="button" aria-expanded="false" aria-controls="branchesMapPanel">
     <span aria-hidden="true">📍</span> Mapa das filiais
@@ -242,7 +243,16 @@ body.apk-webview .field select{
   </div>
   <div id="branchesMap" role="application" aria-label="Mapa interativo das filiais da União Transportes"></div>
   <div class="map-footnote"><span class="coverage-legend" aria-hidden="true"></span> Área verde: municípios cadastrados para a filial selecionada · Limites municipais: IBGE · Ruas: OpenStreetMap.</div>
-</section><section id="result" class="result hidden" aria-live="polite"></section><section id="noMatch" class="empty hidden">Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.</section><section id="coverageWarning" class="coverage-warning hidden" aria-live="polite"></section><section id="settingsPanel" class="settings-panel hidden"><div class="panel-head"><h2>Cadastro de filiais e cidades</h2><button class="close" id="closeSettings" type="button" onclick="document.getElementById('settingsPanel').classList.add('hidden');document.getElementById('openSettings').setAttribute('aria-expanded','false')">Fechar</button></div><p id="syncStatus">Os dados ficam compartilhados entre os dispositivos pelo Supabase. As alterações são salvas diretamente no banco.</p><div id="adminWorkspace"><div class="tabs" role="tablist"><button class="tab active" id="tabBranches" type="button" role="tab" aria-selected="true">🏢 Cadastrar filiais</button><button class="tab" id="tabCities" type="button" role="tab" aria-selected="false">📍 Cadastrar cidades</button></div><section id="branchTab"><form id="branchForm"><input id="editingId" type="hidden"><div class="field"><label for="branchName">Nome ou código da filial</label><input id="branchName" required maxlength="90" placeholder="Ex.: 006 — Goiânia"></div><button class="primary" id="saveBranch" type="submit">Cadastrar filial</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas</div><div id="branchList" class="list"></div></section><section id="cityTab" class="hidden"><form id="cityForm"><input id="editingCityKey" type="hidden"><input id="editingCityBranch" type="hidden"><div class="field"><label for="cityUf">Estado (UF)</label><select id="cityUf" required><option value="">Selecione uma UF</option></select></div><div class="field"><label for="cityName">Nome da cidade</label><input id="cityName" required maxlength="90" placeholder="Escolha a UF e digite a cidade" autocomplete="off" aria-autocomplete="list" aria-controls="municipalityOptions"><div id="municipalityOptions" class="municipality-options" role="listbox" aria-label="Sugestões de municípios"></div><datalist id="municipalitySuggestions" class="hidden"></datalist><small id="municipalityHint" style="display:block;color:var(--muted);margin-top:6px">Selecione uma UF para ver sugestões de municípios.</small></div><div class="field"><label for="cityObservation">Observação (opcional)</label><input id="cityObservation" maxlength="300" placeholder="Ex.: Atendimento somente às terças"></div><div class="field"><label for="cityBranch">Filial cadastrada responsável</label><select id="cityBranch" required><option value="">Selecione uma filial cadastrada</option></select></div><div class="field"><label for="cityDeliveryDays">Previsão de entrega</label><select id="cityDeliveryDays" required><option value="7">7 dias</option><option value="9">9 dias</option><option value="12">12 dias</option><option value="15">15 dias</option><option value="18">18 dias</option></select></div><div class="field"><label for="cityRedespacho">É redespacho?</label><select id="cityRedespacho" required><option value="nao">Não</option><option value="sim">Sim</option></select></div><button class="primary" id="saveCity" type="submit">Cadastrar cidade</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelCityEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas — toque para ver as cidades</div><div id="cityList" class="list"></div></section></div></section><p class="footer">UNIÃO TRANSPORTES · Consulta interna de atendimento</p></main><script>
+</section>
+<section class="city-directory" id="cityDirectory">
+ <button class="directory-toggle" id="directoryToggle" type="button" aria-expanded="false" aria-controls="directoryPanel"><span class="directory-toggle-icon" aria-hidden="true">⌕</span><span><strong>Acesso rápido</strong><small>Encontre uma cidade na lista completa</small></span><span class="directory-toggle-chevron" aria-hidden="true">⌄</span></button><div class="directory-panel hidden" id="directoryPanel"><div class="directory-heading"><div><div class="directory-eyebrow">CONSULTA RÁPIDA</div><h2>Explorar cidades atendidas</h2><p>Veja as cidades cadastradas e filtre por estado ou filial.</p></div><span class="directory-count" id="directoryCount">Carregando…</span></div>
+ <div class="directory-filters">
+  <label>Buscar cidade<input id="directorySearch" type="search" placeholder="Digite parte do nome…"></label>
+  <label>Estado<select id="directoryUf"><option value="">Todos os estados</option></select></label>
+  <label>Filial<select id="directoryBranch"><option value="">Todas as filiais</option></select></label>
+ </div>
+ <div class="directory-results" id="directoryResults" aria-live="polite"></div></div>
+</section><section id="settingsPanel" class="settings-panel hidden"><div class="panel-head"><h2>Cadastro de filiais e cidades</h2><button class="close" id="closeSettings" type="button" onclick="document.getElementById('settingsPanel').classList.add('hidden');document.getElementById('openSettings').setAttribute('aria-expanded','false')">Fechar</button></div><p id="syncStatus">Os dados ficam compartilhados entre os dispositivos pelo Supabase. As alterações são salvas diretamente no banco.</p><div id="adminWorkspace"><div class="tabs" role="tablist"><button class="tab active" id="tabBranches" type="button" role="tab" aria-selected="true">🏢 Cadastrar filiais</button><button class="tab" id="tabCities" type="button" role="tab" aria-selected="false">📍 Cadastrar cidades</button></div><section id="branchTab"><form id="branchForm"><input id="editingId" type="hidden"><div class="field"><label for="branchName">Nome ou código da filial</label><input id="branchName" required maxlength="90" placeholder="Ex.: 006 — Goiânia"></div><button class="primary" id="saveBranch" type="submit">Cadastrar filial</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas</div><div id="branchList" class="list"></div></section><section id="cityTab" class="hidden"><form id="cityForm"><input id="editingCityKey" type="hidden"><input id="editingCityBranch" type="hidden"><div class="field"><label for="cityUf">Estado (UF)</label><select id="cityUf" required><option value="">Selecione uma UF</option></select></div><div class="field"><label for="cityName">Nome da cidade</label><input id="cityName" required maxlength="90" placeholder="Escolha a UF e digite a cidade" autocomplete="off" aria-autocomplete="list" aria-controls="municipalityOptions"><div id="municipalityOptions" class="municipality-options" role="listbox" aria-label="Sugestões de municípios"></div><datalist id="municipalitySuggestions" class="hidden"></datalist><small id="municipalityHint" style="display:block;color:var(--muted);margin-top:6px">Selecione uma UF para ver sugestões de municípios.</small></div><div class="field"><label for="cityObservation">Observação (opcional)</label><input id="cityObservation" maxlength="300" placeholder="Ex.: Atendimento somente às terças"></div><div class="field"><label for="cityBranch">Filial cadastrada responsável</label><select id="cityBranch" required><option value="">Selecione uma filial cadastrada</option></select></div><div class="field"><label for="cityDeliveryDays">Previsão de entrega</label><select id="cityDeliveryDays" required><option value="7">7 dias</option><option value="9">9 dias</option><option value="12">12 dias</option><option value="15">15 dias</option><option value="18">18 dias</option></select></div><div class="field"><label for="cityRedespacho">É redespacho?</label><select id="cityRedespacho" required><option value="nao">Não</option><option value="sim">Sim</option></select></div><button class="primary" id="saveCity" type="submit">Cadastrar cidade</button><button class="close hidden" style="width:100%;margin-top:8px" type="button" id="cancelCityEdit">Cancelar edição</button></form><div class="section-title">Filiais cadastradas — toque para ver as cidades</div><div id="cityList" class="list"></div></section></div></section><p class="footer">UNIÃO TRANSPORTES · Consulta interna de atendimento</p></main><script>
 if(location.hostname.toLowerCase()==="lista-cidades.vercel.app"){const adminButton=document.getElementById("openSettings");if(adminButton)adminButton.remove();const noMatch=document.getElementById("noMatch");if(noMatch)noMatch.innerHTML="Não encontramos essa cidade no cadastro. Confira a escrita ou entre em contato com a União Transportes.";}const SUPABASE_URL="https://ioxxlfcygmkrktesocqn.supabase.co";const SUPABASE_KEY="sb_publishable_dQ7zjxVT2nlCHnnHurg1ZQ_J6irE9Kp";const apiHeaders={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};async function dbRequest(path,options={}){const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers:{...apiHeaders,...(options.headers||{})}});const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!response.ok)throw new Error(data?.message||data?.details||("Supabase HTTP "+response.status+": "+raw.slice(0,240)));return data}let remoteReady=false;let records=[];const $=id=>document.getElementById(id);const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('pt-BR');let saveInProgress=false;let confirmedRecords=[];const cloneRecords=list=>list.map(r=>({...r,cities:[...r.cities],citySettings:{...(r.citySettings||{})}}));const save=async()=>{if(saveInProgress){alert('Já existe uma gravação em andamento. Aguarde a conclusão.');return}if(!remoteReady){alert('Os dados compartilhados ainda não foram carregados. Atualize a página e tente novamente antes de editar.');return}saveInProgress=true;const submitButtons=[$('saveBranch'),$('saveCity')],previous=submitButtons.map(b=>b.disabled);submitButtons.forEach(b=>b.disabled=true);try{const data=await dbRequest("city_directory?id=eq.1&select=id",{method:"PATCH",headers:{"Prefer":"return=representation"},body:JSON.stringify({records})});if(!Array.isArray(data)||!data.some(row=>row.id===1))throw new Error("Nenhuma linha foi atualizada. Verifique as permissões de gravação do banco.");confirmedRecords=cloneRecords(records);render();$('syncStatus').textContent='Dados sincronizados com o Supabase.'}catch(error){alert('Não foi possível salvar no Supabase. As alterações não foram confirmadas. '+(error?.message||'Erro desconhecido.'));console.error(error);try{const rows=await dbRequest("city_directory?id=eq.1&select=records");const data=Array.isArray(rows)?rows[0]:null;if(data&&Array.isArray(data.records)){records=cloneRecords(data.records);confirmedRecords=cloneRecords(data.records);render();return}}catch(readError){console.error(readError)}records=cloneRecords(confirmedRecords);render()}finally{saveInProgress=false;submitButtons.forEach((b,i)=>b.disabled=previous[i])}};const MAP_CACHE_DB_NAME='uniao-coverage-cache';
 const MAP_CACHE_DB_VERSION=1;
 const MAP_CACHE_STORE='entries';
@@ -392,11 +402,84 @@ const stateHolidays={
 const monthDay=key.slice(5);
 return stateHolidays[uf]?.[monthDay]||null}
 function calculateBusinessDeadline(startDate,businessDays,uf){let cursor=new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate()),counted=0;const holidays=[];let safety=0;while(counted<businessDays&&safety<1500){cursor=addCalendarDays(cursor,1);safety++;const weekday=cursor.getDay();if(weekday===0||weekday===6)continue;const holiday=getHolidayName(cursor,uf);if(holiday){holidays.push({date:new Date(cursor),name:holiday});continue}counted++}if(counted!==businessDays)throw new Error('Não foi possível calcular o prazo informado.');return {date:cursor,holidays}}
-function buildDeadlineCalculator(f,uf){const wrap=document.createElement('div');wrap.className='deadline-calculator';const toggle=document.createElement('button');toggle.type='button';toggle.className='deadline-calc-button';toggle.textContent='🗓️ Calculadora de prazo';toggle.setAttribute('aria-expanded','false');const panel=document.createElement('div');panel.className='deadline-calc-panel hidden';const label=document.createElement('label');const input=document.createElement('input');input.type='date';input.className='deadline-date-input';input.value=localDateInputValue();input.max='';const inputId='deadlineDate'+(++deadlineCalculatorSequence);input.id=inputId;label.htmlFor=inputId;label.textContent='Data em que a mercadoria entrou no galpão';const help=document.createElement('small');help.className='deadline-help';help.textContent='A data de entrada não é contada. O prazo começa no próximo dia útil. São considerados feriados nacionais e estaduais; pontos facultativos e feriados municipais não entram automaticamente.';const output=document.createElement('div');output.className='deadline-summary';output.setAttribute('aria-live','polite');panel.append(label,input,help,output);wrap.append(toggle,panel);
-function update(){output.replaceChildren();const startDate=parseLocalDate(input.value);if(!startDate){output.textContent='Selecione uma data válida para calcular a previsão.';return}const days=Number.parseInt(f.deliveryDays,10);if(!Number.isInteger(days)||days<1){output.textContent='O prazo desta cidade não está cadastrado corretamente.';return}let result;try{result=calculateBusinessDeadline(startDate,days,uf||f.uf||'')}catch(error){output.textContent=error.message||'Não foi possível calcular o prazo.';return}const title=document.createElement('strong');title.textContent='PREVISÃO DE ENTREGA';const date=document.createElement('span');date.className='deadline-date-result';date.textContent=formatDateBR(result.date);const detail=document.createElement('p');detail.textContent=days+' dias úteis a partir do próximo dia útil após a entrada no galpão.';output.append(title,date,detail);if(result.holidays.length){const note=document.createElement('div');note.className='deadline-holidays';const noteTitle=document.createElement('strong');noteTitle.textContent='Feriado(s) que estenderam o prazo';const list=document.createElement('ul');result.holidays.forEach(item=>{const li=document.createElement('li');li.textContent=formatDateBR(item.date)+' — '+item.name;list.append(li)});note.append(noteTitle,list);output.append(note)}else{const note=document.createElement('p');note.textContent='Nenhum feriado nacional ou estadual em dia útil foi encontrado no período.';output.append(note)}}
+function buildDeadlineCalculator(f,uf,city){const wrap=document.createElement('div');wrap.className='deadline-calculator';const toggle=document.createElement('button');toggle.type='button';toggle.className='deadline-calc-button';toggle.textContent='🗓️ Calculadora de prazo';toggle.setAttribute('aria-expanded','false');const panel=document.createElement('div');panel.className='deadline-calc-panel hidden';const label=document.createElement('label');const input=document.createElement('input');input.type='date';input.className='deadline-date-input';input.value=localDateInputValue();input.max='';const inputId='deadlineDate'+(++deadlineCalculatorSequence);input.id=inputId;label.htmlFor=inputId;label.textContent='Data em que a mercadoria entrou no galpão';const help=document.createElement('small');help.className='deadline-help';help.textContent='A data de entrada não é contada. O prazo começa no próximo dia útil. São considerados feriados nacionais e estaduais; pontos facultativos e feriados municipais não entram automaticamente.';const output=document.createElement('div');output.className='deadline-summary';output.setAttribute('aria-live','polite');panel.append(label,input,help,output);wrap.append(toggle,panel);
+function update(){output.replaceChildren();const startDate=parseLocalDate(input.value);if(!startDate){output.textContent='Selecione uma data válida para calcular a previsão.';return}const days=Number.parseInt(f.deliveryDays,10);if(!Number.isInteger(days)||days<1){output.textContent='O prazo desta cidade não está cadastrado corretamente.';return}let result;try{result=calculateBusinessDeadline(startDate,days,uf||f.uf||'')}catch(error){output.textContent=error.message||'Não foi possível calcular o prazo.';return}const title=document.createElement('strong');title.textContent='PREVISÃO DE ENTREGA';const date=document.createElement('span');date.className='deadline-date-result';date.textContent=formatDateBR(result.date);const detail=document.createElement('p');detail.textContent=days+' dias úteis a partir do próximo dia útil após a entrada no galpão.';output.append(title,date,detail);if(result.holidays.length){const note=document.createElement('div');note.className='deadline-holidays';const noteTitle=document.createElement('strong');noteTitle.textContent='Feriado(s) que estenderam o prazo';const list=document.createElement('ul');result.holidays.forEach(item=>{const li=document.createElement('li');li.textContent=formatDateBR(item.date)+' — '+item.name;list.append(li)});note.append(noteTitle,list);output.append(note)}const copy=document.createElement('button');copy.type='button';copy.className='deadline-copy-result';copy.textContent='Copiar previsão completa';copy.addEventListener('click',async()=>{
+const lines=[
+  'Previsão de entrega: '+formatDateBR(result.date),
+  'Prazo: '+days+' dias úteis',
+  'Data de entrada no galpão: '+formatDateBR(startDate)
+];
+if(result.holidays.length){
+  lines.push('Feriados que estenderam o prazo:');
+  result.holidays.forEach(item=>lines.push(formatDateBR(item.date)+' — '+item.name));
+}
+const textToCopy=lines.join('\n');
+try{
+  if(navigator.clipboard&&window.isSecureContext){
+    await navigator.clipboard.writeText(textToCopy);
+  }else{
+    const area=document.createElement('textarea');
+    area.value=textToCopy;
+    area.readOnly=true;
+    area.setAttribute('aria-hidden','true');
+    area.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;padding:0;border:0;opacity:0.01;z-index:-1;font-size:16px';
+    document.body.appendChild(area);
+    area.focus({preventScroll:true});
+    area.select();
+    area.setSelectionRange(0,area.value.length);
+    const copied=document.execCommand('copy');
+    area.blur();
+    area.remove();
+    if(!copied)throw new Error('O navegador bloqueou a cópia.');
+  }
+  copy.textContent='Previsão copiada!';
+}catch(error){
+  console.error('Falha ao copiar somente os dados da previsão:',error);
+  copy.textContent='Não foi possível copiar';
+}
+setTimeout(()=>copy.textContent='Copiar previsão completa',1800)
+});output.append(copy);
+const shareCard=document.createElement('button');shareCard.type='button';shareCard.className='deadline-copy-result deadline-share-card';shareCard.textContent='Compartilhar cartão';
+shareCard.addEventListener('click',async()=>{
+ const original=shareCard.textContent;shareCard.disabled=true;shareCard.textContent='Preparando cartão…';
+ try{
+  const holidayLines=(result.holidays||[]).map(item=>formatDateBR(item.date)+' — '+item.name);
+  const canvasHeight=holidayLines.length?640+holidayLines.length*30:560;
+  const canvas=document.createElement('canvas');canvas.width=900;canvas.height=canvasHeight;
+  const ctx=canvas.getContext('2d');
+  const bg=ctx.createLinearGradient(0,0,900,canvasHeight);bg.addColorStop(0,'#06172d');bg.addColorStop(.55,'#0b3150');bg.addColorStop(1,'#06434a');ctx.fillStyle=bg;ctx.fillRect(0,0,900,canvasHeight);
+  const glow=ctx.createRadialGradient(760,70,10,760,70,430);glow.addColorStop(0,'rgba(73,226,255,.28)');glow.addColorStop(1,'rgba(73,226,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,900,canvasHeight);
+  ctx.strokeStyle='rgba(116,224,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(24,24,852,canvasHeight-48,30);ctx.stroke();
+  ctx.fillStyle='#dff7ff';ctx.beginPath();ctx.roundRect(58,54,58,58,17);ctx.fill();ctx.fillStyle='#087bb4';ctx.font='900 36px Arial';ctx.textAlign='center';ctx.fillText('T',87,94);
+  ctx.textAlign='left';ctx.fillStyle='#f0faff';ctx.font='800 26px Arial';ctx.fillText('UNIÃO TRANSPORTES',136,80);ctx.fillStyle='#91b9d7';ctx.font='15px Arial';ctx.fillText('CONSULTA DE CIDADES',136,105);
+  ctx.fillStyle='#78e7ff';ctx.font='700 16px Arial';ctx.fillText('PREVISÃO DE ENTREGA',62,174);
+  ctx.fillStyle='#ffffff';ctx.font='800 48px Arial';let cityLabel=String(city||'Cidade consultada')+(uf?' - '+uf:'');while(ctx.measureText(cityLabel).width>760&&cityLabel.length>12)cityLabel=cityLabel.slice(0,-2)+'…';ctx.fillText(cityLabel,62,244);
+  ctx.strokeStyle='rgba(145,211,240,.30)';ctx.beginPath();ctx.moveTo(62,278);ctx.lineTo(838,278);ctx.stroke();
+  ctx.fillStyle='#a9dff5';ctx.font='700 18px Arial';ctx.fillText('DATA PREVISTA',64,330);
+  ctx.fillStyle='#ffffff';ctx.font='800 58px Arial';ctx.fillText(formatDateBR(result.date),64,405);
+  ctx.fillStyle='#a9dff5';ctx.font='700 18px Arial';ctx.fillText('PRAZO DE ENTREGA',64,462);
+  ctx.fillStyle='#ffffff';ctx.font='700 26px Arial';ctx.fillText(days+' dias úteis',64,500);
+  let footerY=510;
+  if(holidayLines.length){
+   ctx.strokeStyle='rgba(145,211,240,.30)';ctx.beginPath();ctx.moveTo(62,530);ctx.lineTo(838,530);ctx.stroke();
+   ctx.textAlign='left';ctx.fillStyle='#ffd98a';ctx.font='700 18px Arial';ctx.fillText('PRAZO ESTENDIDO POR FERIADO(S)',64,568);
+   ctx.fillStyle='#f4f8ff';ctx.font='16px Arial';
+   holidayLines.forEach((line,index)=>{let shown=line;while(ctx.measureText('• '+shown).width>760&&shown.length>12)shown=shown.slice(0,-2)+'…';ctx.fillText('• '+shown,68,602+index*30)});
+   footerY=canvasHeight-30;
+  }
+  ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.textAlign='right';ctx.fillText('Previsão calculada considerando feriados e dias úteis',838,footerY);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('Falha ao gerar imagem')),'image/png'));
+  const file=new File([blob],'previsao-entrega-'+norm(city||'cidade').replace(/[^a-z0-9]+/g,'-')+'.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Previsão de entrega · União Transportes',text:'Previsão de entrega para '+cityLabel,files:[file]});}
+  else if(navigator.share){await navigator.share({title:'Previsão de entrega · União Transportes',text:cityLabel+'\nPrevisão de entrega: '+formatDateBR(result.date)+'\nPrazo: '+days+' dias úteis'});}
+  else{const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=file.name;link.click();URL.revokeObjectURL(link.href);shareCard.textContent='Cartão gerado';}
+ }catch(error){if(error?.name!=='AbortError'){console.error('Falha ao compartilhar cartão de previsão:',error);shareCard.textContent='Não foi possível gerar';}}
+ finally{shareCard.disabled=false;setTimeout(()=>shareCard.textContent=original,2200)}
+});
+output.append(shareCard)}
 toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));if(opening)update()});input.addEventListener('change',update);return wrap}
 let deadlineCalculatorSequence=0;
-function showCity(city,uf=''){const found=allCities().filter(x=>norm(x.city)===norm(city)&&(!uf||!x.uf||x.uf===uf)),box=$('result');box.classList.remove('hidden');$('noMatch').classList.add('hidden');$('coverageWarning').classList.add('hidden');box.innerHTML='';const label=document.createElement('div');label.className='label';label.textContent=found.length>1?'Atenção · mais de uma filial cadastrada':'Filial responsável';const h=document.createElement('h2');h.textContent=city+(uf?' - '+uf:'');const p=document.createElement('p');p.textContent=found.length>1?'Encontramos mais de uma associação para esta cidade:':'Cidade localizada no cadastro.';box.append(label,h,p);found.forEach(f=>{const b=document.createElement('div');b.className='branch';const i=document.createElement('div');i.className='branch-icon';i.textContent='↗';const d=document.createElement('div'),s=document.createElement('strong'),sm=document.createElement('small');s.textContent=f.branch;sm.textContent='Previsão: '+f.deliveryDays+' dias · Redespacho: '+(f.redespacho==='sim'?'Sim':'Não');d.append(s,sm);b.append(i,d);box.append(b);if(String(f.observation||'').trim()){const note=document.createElement('div');note.className='city-observation-card';const icon=document.createElement('div');icon.className='city-observation-icon';icon.textContent='ℹ';const body=document.createElement('div');body.className='city-observation-body';const title=document.createElement('strong');title.textContent='Observação';const message=document.createElement('p');message.textContent=String(f.observation).trim();body.append(title,message);note.append(icon,body);box.append(note)}box.append(buildDeadlineCalculator(f,uf||f.uf||''))})}
+function showCity(city,uf=''){const found=allCities().filter(x=>norm(x.city)===norm(city)&&(!uf||!x.uf||x.uf===uf)),box=$('result');box.classList.remove('hidden');$('noMatch').classList.add('hidden');$('coverageWarning').classList.add('hidden');box.innerHTML='';const label=document.createElement('div');label.className='label';label.textContent=found.length>1?'Atenção · mais de uma filial cadastrada':'Filial responsável';const h=document.createElement('h2');h.textContent=city+(uf?' - '+uf:'');const p=document.createElement('p');p.textContent=found.length>1?'Encontramos mais de uma associação para esta cidade:':'Cidade localizada no cadastro.';box.append(label,h,p);found.forEach(f=>{const b=document.createElement('div');b.className='branch';const i=document.createElement('div');i.className='branch-icon';i.textContent='↗';const d=document.createElement('div'),s=document.createElement('strong'),sm=document.createElement('small');s.textContent=f.branch;sm.textContent='Previsão: '+f.deliveryDays+' dias · Redespacho: '+(f.redespacho==='sim'?'Sim':'Não');d.append(s,sm);b.append(i,d);box.append(b);if(String(f.observation||'').trim()){const note=document.createElement('div');note.className='city-observation-card';const icon=document.createElement('div');icon.className='city-observation-icon';icon.textContent='ℹ';const body=document.createElement('div');body.className='city-observation-body';const title=document.createElement('strong');title.textContent='Observação';const message=document.createElement('p');message.textContent=String(f.observation).trim();body.append(title,message);note.append(icon,body);box.append(note)}box.append(buildDeadlineCalculator(f,uf||f.uf||'',city))})}
 
 function resetNoMatchMessage(){$('noMatch').innerHTML='Não encontramos essa cidade no cadastro. Confira a escrita ou adicione a cidade nas <b>Configurações</b>.'}
 function setLookupMode(mode){
@@ -824,4 +907,193 @@ function startCityRegistryWatcher(){
 
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 (async()=>{await Promise.all([loadSharedRecords(),loadIbge()]);render();startCityRegistryWatcher()})();
-</script></body></html>
+</script><style>
+/* Redesign institucional — consulta pública */
+body{background:#030d1d;color:#f4f8ff}
+body:before{content:"";position:fixed;inset:0;z-index:-3;background:radial-gradient(ellipse at 12% 8%,#0b477055 0%,transparent 38%),radial-gradient(ellipse at 88% 18%,#183e8b55 0%,transparent 34%),radial-gradient(ellipse at 55% 95%,#007c7950 0%,transparent 38%),linear-gradient(145deg,#030b19 0%,#071a33 52%,#041426 100%);background-size:150% 150%;animation:publicAmbient 28s ease-in-out infinite alternate}
+body:after{opacity:.2;filter:blur(58px)}
+header,main{max-width:900px}
+header{padding-top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:18px}
+main{padding-top:20px;padding-bottom:56px}
+.intro{margin:26px 0 25px;padding:30px;border:1px solid #5acbff2e;border-radius:24px;background:linear-gradient(115deg,#0b2745dc,#0b2038c9 60%,#073a43a6);box-shadow:0 18px 54px #0003,inset 0 1px #ffffff12;backdrop-filter:blur(14px)}
+.intro h1{font-size:clamp(31px,5.5vw,48px);letter-spacing:-.05em}
+.search-card,.result,.empty{border-radius:20px;border-color:#47769a70;background:linear-gradient(145deg,#0b2038f5,#081a30f2);box-shadow:0 20px 56px #0004,inset 0 1px #ffffff0c;backdrop-filter:blur(16px)}
+.search-card{padding:clamp(18px,3vw,26px)}
+.lookup-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;border:1px solid #365876;border-radius:14px;background:#06162a;margin-bottom:18px}
+.lookup-mode{min-height:42px;border:0;border-radius:10px;background:transparent;color:#9fb8d0;font-weight:750;transition:background .2s,color .2s}
+.lookup-mode.active{background:linear-gradient(115deg,#124c78,#155c86 58%,#087d80);color:#fff;box-shadow:0 5px 16px #0003,inset 0 1px #ffffff20}
+.search-wrap input,.field input,.field select{border-radius:12px;background:#041327;border-color:#3d6281;min-height:48px}
+.clear,.primary{border-radius:12px;min-height:46px}
+.suggestions,.municipality-options{border-color:#3b6281;border-radius:14px}
+.suggestion,.municipality-option{padding:14px 15px}
+.result{padding:22px;margin-top:18px}
+.result h2{font-size:clamp(23px,4vw,30px);letter-spacing:-.025em}
+.branch{border:1px solid #3b6886;border-radius:14px;background:linear-gradient(110deg,#0a2b49,#0b263d);padding:15px}
+.branch-icon{flex:0 0 40px;width:40px;height:40px}
+.branch-observation{margin-top:10px;padding:10px 12px;border-left:2px solid #58cfff;background:#061a2e;border-radius:0 10px 10px 0}
+.branch-observation p{margin:5px 0 0;line-height:1.5}
+.map-toolbar{margin:12px 0 0}
+.map-trigger{min-height:44px;padding:11px 16px;border:1px solid #4c83a6;border-radius:12px;background:#0a2540;color:#e7f6ff;font-weight:750;transition:background .2s,border-color .2s}
+.map-trigger:hover{background:#103a5c;border-color:#69d7ff}
+.branches-map-panel{border:1px solid #47769a70;border-radius:20px;background:#081a30;padding:18px;margin-top:12px;box-shadow:0 20px 56px #0004}
+.map-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.map-heading h2{margin:6px 0;font-size:21px}
+.map-heading p{margin:0;color:#a9c0d5;font-size:13px;line-height:1.5}
+#branchesMap{border-radius:14px;overflow:hidden}
+.footer{color:#86a8c7}
+@keyframes publicAmbient{0%{background-position:0% 20%}100%{background-position:100% 80%}}
+@media(max-width:600px){header,main{max-width:100%}.intro{padding:23px 19px;margin-top:18px}.search-wrap{gap:7px}.clear{padding:10px 12px}.map-heading{flex-direction:column}.map-heading .close{align-self:flex-end}}
+@media(prefers-reduced-motion:reduce){body:before{animation:none!important}}
+</style><style>html{min-height:100%;background:#030d1d}body{background:transparent;isolation:isolate}body:before{z-index:-1}body:after{z-index:-2}</style><script>
+/* Diretório público de cidades: filtros e atalhos de consulta */
+(()=>{
+ const byId=id=>document.getElementById(id);
+ const search=byId('directorySearch'),uf=byId('directoryUf'),branch=byId('directoryBranch'),results=byId('directoryResults'),count=byId('directoryCount');
+ const toggle=byId('directoryToggle'),directoryPanel=byId('directoryPanel');
+ if(toggle&&directoryPanel){toggle.addEventListener('click',()=>{const opening=directoryPanel.classList.contains('hidden');directoryPanel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));toggle.querySelector('.directory-toggle-chevron').textContent=opening?'⌃':'⌄';if(opening)directoryPanel.scrollIntoView({behavior:'smooth',block:'nearest'});});}
+ if(!search||!uf||!branch||!results||!count)return;
+ const escapeText=value=>String(value??'');
+ function refreshDirectoryOptions(){
+  const oldUf=uf.value,oldBranch=branch.value;
+  uf.innerHTML='<option value="">Todos os estados</option>';
+  [...new Set(allCities().map(x=>String(x.uf||'').toUpperCase()).filter(Boolean))].sort().forEach(code=>{
+   const option=document.createElement('option');option.value=code;option.textContent=(ufNames[code]||code)+' ('+code+')';uf.append(option);
+  });
+  branch.innerHTML='<option value="">Todas as filiais</option>';
+  records.slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).forEach(item=>{
+   const option=document.createElement('option');option.value=item.name;option.textContent=item.name;branch.append(option);
+  });
+  if([...uf.options].some(x=>x.value===oldUf))uf.value=oldUf;
+  if([...branch.options].some(x=>x.value===oldBranch))branch.value=oldBranch;
+ }
+ function drawDirectory(){
+  const q=norm(search.value),state=uf.value,selectedBranch=branch.value;
+  const data=allCities().filter(item=>(!q||norm(item.city).includes(q))&&(!state||String(item.uf||'').toUpperCase()===state)&&(!selectedBranch||item.branch===selectedBranch));
+  count.textContent=data.length+' cidade'+(data.length===1?'':'s');
+  results.replaceChildren();
+  if(!data.length){const empty=document.createElement('p');empty.className='directory-empty';empty.textContent='Nenhuma cidade encontrada com esses filtros.';results.append(empty);return}
+  data.slice(0,120).forEach(item=>{
+   const button=document.createElement('button');button.type='button';button.className='directory-city';
+   const left=document.createElement('span');left.className='directory-city-main';
+   const name=document.createElement('strong');name.textContent=item.city;
+   const detail=document.createElement('small');detail.textContent=(item.uf||'UF não informada')+' · '+item.branch;
+   left.append(name,detail);
+   const right=document.createElement('span');right.className='directory-city-meta';
+   const sla=document.createElement('b');sla.textContent=item.deliveryDays+' dias';
+   const red=document.createElement('small');red.textContent=item.redespacho==='sim'?'Redespacho':'Direto';
+   right.append(sla,red);button.append(left,right);
+   button.addEventListener('click',()=>{
+    $('citySearch').value=item.city+(item.uf?' - '+item.uf:'');
+    render();showCity(item.city,item.uf||'');
+    $('result').scrollIntoView({behavior:'smooth',block:'center'});
+   });
+   results.append(button);
+  });
+  if(data.length>120){const note=document.createElement('p');note.className='directory-note';note.textContent='Exibindo as primeiras 120 cidades. Refine os filtros para localizar as demais.';results.append(note)}
+ }
+ search.addEventListener('input',drawDirectory);
+ uf.addEventListener('change',drawDirectory);
+ branch.addEventListener('change',drawDirectory);
+ const previousRender=render;
+ render=function(){previousRender();refreshDirectoryOptions();drawDirectory()};
+ refreshDirectoryOptions();drawDirectory();
+ const previousShowCity=showCity;
+ showCity=function(city,state=''){
+  previousShowCity(city,state);
+  const result=byId('result');
+  const old=result.querySelector('.result-actions');if(old)old.remove();
+  const matches=allCities().filter(x=>norm(x.city)===norm(city)&&(!state||!x.uf||x.uf===state));
+  const summary=[city+(state?' - '+state:''),...matches.map(x=>x.branch+' | Prazo: '+x.deliveryDays+' dias | Redespacho: '+(x.redespacho==='sim'?'Sim':'Não')+(x.observation?' | Observação: '+x.observation:''))].join('\n');
+  const actions=document.createElement('div');actions.className='result-actions';
+  const copy=document.createElement('button');copy.type='button';copy.className='result-action';copy.textContent='Copiar resultado';
+  copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(summary);copy.textContent='Copiado!'}catch{copy.textContent='Não foi possível copiar'}setTimeout(()=>copy.textContent='Copiar resultado',1800)});
+  const share=document.createElement('button');share.type='button';share.className='result-action result-share';share.textContent='Compartilhar cartão';
+  share.addEventListener('click',async()=>{
+   const original=share.textContent;share.disabled=true;share.textContent='Preparando cartão…';
+   try{
+    const canvas=document.createElement('canvas');canvas.width=720;canvas.height=430;
+    const ctx=canvas.getContext('2d');
+    const bg=ctx.createLinearGradient(0,0,720,430);bg.addColorStop(0,'#071a32');bg.addColorStop(.58,'#0b3150');bg.addColorStop(1,'#073b43');ctx.fillStyle=bg;ctx.fillRect(0,0,720,430);
+    const glow=ctx.createRadialGradient(600,40,10,600,40,330);glow.addColorStop(0,'rgba(65,220,255,.22)');glow.addColorStop(1,'rgba(65,220,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,720,430);
+    ctx.strokeStyle='rgba(112,220,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(22,22,676,386,26);ctx.stroke();
+    ctx.fillStyle='#dff7ff';ctx.beginPath();ctx.roundRect(48,48,54,54,16);ctx.fill();ctx.fillStyle='#087bb4';ctx.font='900 34px Arial';ctx.textAlign='center';ctx.fillText('T',75,86);
+    ctx.textAlign='left';ctx.fillStyle='#eaf8ff';ctx.font='800 23px Arial';ctx.fillText('UNIÃO TRANSPORTES',120,72);ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.fillText('CONSULTA DE CIDADES',120,96);
+    ctx.fillStyle='#79e7ff';ctx.font='700 13px Arial';ctx.fillText('RESULTADO DA CONSULTA',50,150);
+    ctx.fillStyle='#ffffff';ctx.font='800 38px Arial';let cityTitle=String(city+(state?' - '+state:''));while(ctx.measureText(cityTitle).width>610&&cityTitle.length>12)cityTitle=cityTitle.slice(0,-2)+'…';ctx.fillText(cityTitle,50,202);
+    ctx.strokeStyle='rgba(145,211,240,.28)';ctx.beginPath();ctx.moveTo(50,228);ctx.lineTo(670,228);ctx.stroke();
+    ctx.font='700 17px Arial';ctx.fillStyle='#bdeaff';ctx.fillText('FILIAIS E CONDIÇÕES',50,264);
+    ctx.font='16px Arial';ctx.fillStyle='#f1f7ff';
+    const lines=matches.slice(0,3).map(x=>x.branch+'  ·  '+x.deliveryDays+' dias  ·  '+(x.redespacho==='sim'?'Redespacho':'Direto'));
+    if(!lines.length)lines.push('Consulte a União Transportes para mais informações.');
+    lines.forEach((line,i)=>{let textLine=line;while(ctx.measureText(textLine).width>610&&textLine.length>12)textLine=textLine.slice(0,-2)+'…';ctx.fillText('• '+textLine,54,302+i*31)});
+    if(matches.length>3){ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.fillText('+'+(matches.length-3)+' outra(s) opção(ões) no cadastro',54,397)}
+    ctx.fillStyle='#8fb8d6';ctx.font='13px Arial';ctx.fillText('Informações conforme cadastro consultado · uniaotransportes',50,382);
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('Falha ao gerar imagem')),'image/png'));
+    const file=new File([blob],'consulta-uniao-'+norm(city).replace(/[^a-z0-9]+/g,'-')+'.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Consulta União Transportes',text:'Resultado da consulta de '+city+(state?' - '+state:''),files:[file]});}
+    else if(navigator.share){await navigator.share({title:'Consulta União Transportes',text:summary});}
+    else{await navigator.clipboard.writeText(summary);share.textContent='Texto copiado';}
+   }catch(error){if(error?.name!=='AbortError'){console.error(error);share.textContent='Não foi possível compartilhar';}}
+   finally{share.disabled=false;setTimeout(()=>share.textContent=original,2200)}
+  });
+  actions.append(share);result.append(actions);
+ };
+})();
+</script><style>
+/* Hierarquia da consulta e acesso rápido recolhido */
+.search-card{position:relative;border:1px solid #62d9ff99!important;background:linear-gradient(135deg,rgba(8,42,70,.96),rgba(5,24,47,.96))!important;box-shadow:0 18px 52px rgba(0,0,0,.34),0 0 0 3px rgba(50,190,255,.09),0 0 34px rgba(20,164,255,.13)!important}
+.search-card>label,.search-card label{color:#f0fbff}
+#result{margin-top:12px;border:1px solid #57d7ff!important;background:linear-gradient(135deg,rgba(8,43,70,.97),rgba(5,25,48,.97))!important;box-shadow:0 16px 48px rgba(0,0,0,.32),0 0 0 2px rgba(69,205,255,.08),0 0 30px rgba(22,170,255,.13)!important}
+#result .label{font-size:12px;color:#8deaff}
+#result h2{font-size:clamp(26px,5vw,34px)}
+#noMatch,#coverageWarning{margin-top:12px}
+.city-directory{padding:0;border:0;background:transparent;box-shadow:none;margin:18px 0 22px}
+.directory-toggle{width:100%;display:flex;align-items:center;gap:13px;padding:15px 17px;border:1px solid #4e9bc4;border-radius:16px;background:linear-gradient(110deg,rgba(8,42,70,.94),rgba(8,34,59,.94));color:#f4fbff;text-align:left;box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.12);cursor:pointer}
+.directory-toggle-icon{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;border-radius:12px;background:linear-gradient(140deg,#0c83bb,#075d83);font-size:25px;color:#fff}
+.directory-toggle>span:nth-child(2){display:grid;gap:3px;flex:1}
+.directory-toggle strong{font-size:14px;letter-spacing:.02em}
+.directory-toggle small{font-size:12px;color:#a9cce1}
+.directory-toggle-chevron{font-size:22px;color:#8deaff;transition:transform .2s}
+.directory-toggle[aria-expanded="true"] .directory-toggle-chevron{transform:rotate(180deg)}
+.directory-panel{margin-top:10px;padding:18px;border:1px solid #47769a70;border-radius:18px;background:linear-gradient(145deg,#0b2038f5,#081a30f2);box-shadow:0 18px 48px #0003}
+.directory-panel .directory-heading{margin-bottom:15px}
+.directory-panel .directory-results{max-height:360px}
+.result-actions{gap:8px}
+.result-action{min-height:42px}
+.result-share{background:linear-gradient(110deg,#087fc0,#087f91);border-color:#61dfff;color:#fff}
+.result-share:disabled{opacity:.7;cursor:wait}
+@media(max-width:600px){.directory-panel{padding:14px}.directory-toggle{padding:13px}.search-card{padding:18px}.result{padding:18px}}
+
+.deadline-copy-result{display:block;width:100%;margin-top:14px;padding:12px 15px;border:1px solid #55d9ff;border-radius:12px;background:linear-gradient(110deg,#087fc0,#087f91);color:#fff;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 22px #087bc033}.deadline-copy-result:active{transform:translateY(1px)}.deadline-holidays{margin-top:12px}
+/* Correção definitiva: elimina as imagens rasterizadas/embutidas do cenário */
+html{min-height:100%;background:#030d1d!important}body{min-height:100%;background:transparent!important}
+body:before,body.customer-web:before,body.apk-webview:before{
+ content:""!important;position:fixed!important;inset:0!important;z-index:-1!important;
+ background-image:radial-gradient(ellipse at 12% 8%,rgba(11,71,112,.34) 0%,transparent 38%),radial-gradient(ellipse at 88% 18%,rgba(24,62,139,.28) 0%,transparent 34%),radial-gradient(ellipse at 55% 95%,rgba(0,124,121,.22) 0%,transparent 38%),linear-gradient(145deg,#030b19 0%,#071a33 52%,#041426 100%)!important;
+ background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
+ animation:none!important;transform:none!important;filter:none!important;
+}
+body:after{pointer-events:none!important}
+
+.city-directory{margin:18px 0 22px;padding:21px;border:1px solid #47769a70;border-radius:20px;background:linear-gradient(145deg,#0b2038f5,#081a30f2);box-shadow:0 18px 48px #0003}
+.directory-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:17px}
+.directory-eyebrow{font-size:10px;font-weight:850;letter-spacing:.16em;color:#7ceaff}
+.directory-heading h2{margin:6px 0;font-size:clamp(19px,3vw,24px);color:#f4f8ff}
+.directory-heading p{margin:0;color:#a9c0d5;font-size:13px;line-height:1.5}
+.directory-count{flex-shrink:0;padding:7px 10px;border:1px solid #3c7894;border-radius:999px;background:#082a43;color:#aeeaff;font-size:12px;font-weight:800}
+.directory-filters{display:grid;grid-template-columns:1.3fr .8fr 1fr;gap:10px;margin-bottom:14px}
+.directory-filters label{display:grid;gap:6px;color:#b9cde0;font-size:12px;font-weight:750}
+.directory-filters input,.directory-filters select{width:100%;min-width:0;min-height:43px;padding:10px 11px;border:1px solid #3d6281;border-radius:11px;background:#041327;color:#f4f8ff;font:inherit}
+.directory-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:390px;overflow:auto;padding-right:3px}
+.directory-city{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:12px;border:1px solid #315674;border-radius:12px;background:#0a1e33;color:#f4f8ff;text-align:left;cursor:pointer}
+.directory-city:hover{border-color:#5bcfff;background:#0c2944}
+.directory-city-main{display:grid;gap:4px;min-width:0}
+.directory-city-main strong{font-size:13px;overflow-wrap:anywhere}
+.directory-city-main small,.directory-city-meta small{font-size:11px;color:#9fb8d0}
+.directory-city-meta{display:grid;gap:4px;flex-shrink:0;text-align:right}
+.directory-city-meta b{font-size:12px;color:#8ceaff}
+.directory-empty,.directory-note{grid-column:1/-1;margin:4px 0;color:#a9c0d5;font-size:13px;line-height:1.5}
+.result-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px;padding-top:14px;border-top:1px solid #ffffff18}
+.result-action{padding:10px 14px;border:1px solid #4c83a6;border-radius:11px;background:#0a2540;color:#e7f6ff;font-weight:750;cursor:pointer}
+@media(max-width:650px){.city-directory{padding:16px}.directory-filters{grid-template-columns:1fr 1fr}.directory-filters label:first-child{grid-column:1/-1}.directory-results{grid-template-columns:1fr}.directory-heading{flex-direction:column}.directory-count{align-self:flex-start}}
+</style></body></html>
