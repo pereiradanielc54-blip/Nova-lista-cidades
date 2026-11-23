@@ -440,6 +440,7 @@ try{
 setTimeout(()=>copy.textContent='Copiar previsão completa',1800)
 });output.append(copy);
 const shareCard=document.createElement('button');shareCard.type='button';shareCard.className='deadline-copy-result deadline-share-card';shareCard.textContent='Compartilhar cartão';
+const shareHelp=document.createElement('div');shareHelp.className='deadline-share-help hidden';shareHelp.setAttribute('aria-live','polite');shareHelp.innerHTML='<p>Imagem PNG baixada. No WhatsApp Web, abra a conversa, clique no clipe de anexos e escolha <strong>Fotos e vídeos</strong> para enviar o cartão.</p><a href="https://web.whatsapp.com/" target="_blank" rel="noopener noreferrer">Abrir WhatsApp Web</a>';
 shareCard.addEventListener('click',async()=>{
  const original=shareCard.textContent;shareCard.disabled=true;shareCard.textContent='Preparando cartão…';
  try{
@@ -470,13 +471,19 @@ shareCard.addEventListener('click',async()=>{
   ctx.fillStyle='#8fb8d6';ctx.font='14px Arial';ctx.textAlign='right';ctx.fillText('Previsão calculada considerando feriados e dias úteis',838,footerY);
   const blob=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('Falha ao gerar imagem')),'image/png'));
   const file=new File([blob],'previsao-entrega-'+norm(city||'cidade').replace(/[^a-z0-9]+/g,'-')+'.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Previsão de entrega · União Transportes',text:'Previsão de entrega para '+cityLabel,files:[file]});}
-  else if(navigator.share){await navigator.share({title:'Previsão de entrega · União Transportes',text:cityLabel+'\nPrevisão de entrega: '+formatDateBR(result.date)+'\nPrazo: '+days+' dias úteis'});}
-  else{const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=file.name;link.click();URL.revokeObjectURL(link.href);shareCard.textContent='Cartão gerado';}
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+   await navigator.share({title:'Previsão de entrega · União Transportes',text:'Previsão de entrega para '+cityLabel,files:[file]});
+  }else{
+   const objectUrl=URL.createObjectURL(blob);
+   const download=document.createElement('a');download.href=objectUrl;download.download=file.name;download.style.display='none';document.body.appendChild(download);download.click();download.remove();
+   setTimeout(()=>URL.revokeObjectURL(objectUrl),15000);
+   shareCard.textContent='Imagem baixada — anexe no WhatsApp Web';
+   shareHelp.classList.remove('hidden');
+  }
  }catch(error){if(error?.name!=='AbortError'){console.error('Falha ao compartilhar cartão de previsão:',error);shareCard.textContent='Não foi possível gerar';}}
  finally{shareCard.disabled=false;setTimeout(()=>shareCard.textContent=original,2200)}
 });
-output.append(shareCard)}
+output.append(shareCard,shareHelp)}
 toggle.addEventListener('click',()=>{const opening=panel.classList.contains('hidden');panel.classList.toggle('hidden',!opening);toggle.setAttribute('aria-expanded',String(opening));if(opening)update()});input.addEventListener('change',update);return wrap}
 let deadlineCalculatorSequence=0;
 function showCity(city,uf=''){const found=allCities().filter(x=>norm(x.city)===norm(city)&&(!uf||!x.uf||x.uf===uf)),box=$('result');box.classList.remove('hidden');$('noMatch').classList.add('hidden');$('coverageWarning').classList.add('hidden');box.innerHTML='';const label=document.createElement('div');label.className='label';label.textContent=found.length>1?'Atenção · mais de uma filial cadastrada':'Filial responsável';const h=document.createElement('h2');h.textContent=city+(uf?' - '+uf:'');const p=document.createElement('p');p.textContent=found.length>1?'Encontramos mais de uma associação para esta cidade:':'Cidade localizada no cadastro.';box.append(label,h,p);found.forEach(f=>{const b=document.createElement('div');b.className='branch';const i=document.createElement('div');i.className='branch-icon';i.textContent='↗';const d=document.createElement('div'),s=document.createElement('strong'),sm=document.createElement('small');s.textContent=f.branch;sm.textContent='Previsão: '+f.deliveryDays+' dias · Redespacho: '+(f.redespacho==='sim'?'Sim':'Não');d.append(s,sm);b.append(i,d);box.append(b);if(String(f.observation||'').trim()){const note=document.createElement('div');note.className='city-observation-card';const icon=document.createElement('div');icon.className='city-observation-icon';icon.textContent='ℹ';const body=document.createElement('div');body.className='city-observation-body';const title=document.createElement('strong');title.textContent='Observação';const message=document.createElement('p');message.textContent=String(f.observation).trim();body.append(title,message);note.append(icon,body);box.append(note)}box.append(buildDeadlineCalculator(f,uf||f.uf||'',city))})}
@@ -1064,7 +1071,7 @@ main{padding-top:20px;padding-bottom:56px}
 .result-share:disabled{opacity:.7;cursor:wait}
 @media(max-width:600px){.directory-panel{padding:14px}.directory-toggle{padding:13px}.search-card{padding:18px}.result{padding:18px}}
 
-.deadline-copy-result{display:block;width:100%;margin-top:14px;padding:12px 15px;border:1px solid #55d9ff;border-radius:12px;background:linear-gradient(110deg,#087fc0,#087f91);color:#fff;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 22px #087bc033}.deadline-copy-result:active{transform:translateY(1px)}.deadline-holidays{margin-top:12px}
+.deadline-copy-result{display:block;width:100%;margin-top:14px;padding:12px 15px;border:1px solid #55d9ff;border-radius:12px;background:linear-gradient(110deg,#087fc0,#087f91);color:#fff;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 22px #087bc033}.deadline-copy-result:active{transform:translateY(1px)}.deadline-holidays{margin-top:12px}.deadline-share-help{margin-top:10px;padding:13px 15px;border:1px solid #55d9ff66;border-radius:12px;background:rgba(4,25,45,.78);color:#d7eaf7;font-size:13px;line-height:1.55}.deadline-share-help p{margin:0 0 10px}.deadline-share-help a{display:inline-block;color:#83eaff;font-weight:800;text-decoration:underline}
 /* Correção definitiva: elimina as imagens rasterizadas/embutidas do cenário */
 html{min-height:100%;background:#030d1d!important}body{min-height:100%;background:transparent!important}
 body:before,body.customer-web:before,body.apk-webview:before{
