@@ -1010,8 +1010,8 @@ main{padding-top:20px;padding-bottom:56px}
   if(!data.length){alert('Não há resultados para exportar com os filtros selecionados.');return}
   const columns=['Cidade','UF','Filial','Prazo de entrega (dias)','Redespacho','Observação'];
   const rows=data.map(item=>[item.city,item.uf||'',item.branch,item.deliveryDays,item.redespacho==='sim'?'Sim':'Não',item.observation||'']);
-  const csv=[columns,...rows].map(row=>row.map(value=>'"'+String(value??'').replace(/"/g,'""')+'"').join(';')).join('\\r\\n');
-  const blob=new Blob(['\\uFEFF',csv],{type:'text/csv;charset=utf-8;'});
+  const csv=[columns,...rows].map(row=>row.map(value=>'"'+String(value??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const blob=new Blob(['\uFEFF',csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download='cidades-filtradas-uniao-'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
