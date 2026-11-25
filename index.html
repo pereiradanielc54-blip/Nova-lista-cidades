@@ -1004,12 +1004,20 @@ main{padding-top:20px;padding-bottom:56px}
  uf.addEventListener('change',drawDirectory);
  branch.addEventListener('change',drawDirectory);
  redespacho.addEventListener('change',drawDirectory);
- if(exportButton)exportButton.addEventListener('click',()=>{
+ if(exportButton)exportButton.addEventListener('click',async()=>{
   const q=norm(search.value),state=uf.value,selectedBranch=branch.value,selectedRedespacho=redespacho.value;
   const data=allCities().filter(item=>(!q||norm(item.city).includes(q))&&(!state||String(item.uf||'').toUpperCase()===state)&&(!selectedBranch||item.branch===selectedBranch)&&(!selectedRedespacho||item.redespacho===selectedRedespacho));
   if(!data.length){alert('Não há resultados para exportar com os filtros selecionados.');return}
-  const columns=['Cidade','UF','Filial','Prazo de entrega (dias)','Redespacho','Observação'];
-  const rows=data.map(item=>[item.city,item.uf||'',item.branch,item.deliveryDays,item.redespacho==='sim'?'Sim':'Não',item.observation||'']);
+  if(!ibgeLoaded){
+   exportButton.disabled=true;exportButton.textContent='Carregando códigos IBGE…';
+   try{await loadIbge()}catch(error){console.error('Falha ao carregar códigos IBGE:',error);alert('Não foi possível carregar os códigos do IBGE. Verifique a conexão e tente novamente.');return}
+   finally{exportButton.disabled=false;exportButton.textContent='↓ Exportar resultados para Excel'}
+  }
+  const columns=['Cidade','UF','Código IBGE','Filial','Prazo de entrega (dias)','Redespacho','Observação'];
+  const rows=data.map(item=>{
+   const municipality=ibgeCities.find(city=>norm(city.nome)===norm(item.city)&&getIbgeState(city)?.sigla===String(item.uf||'').toUpperCase());
+   return [item.city,item.uf||'',municipality?.id||'',item.branch,item.deliveryDays,item.redespacho==='sim'?'Sim':'Não',item.observation||''];
+  });
   const csv=[columns,...rows].map(row=>row.map(value=>'"'+String(value??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\uFEFF',csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
