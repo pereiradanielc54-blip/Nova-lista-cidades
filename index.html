@@ -1176,4 +1176,48 @@ body:after{pointer-events:none!important}
 .directory-filter-toggle:focus-visible{outline:2px solid #55c8ef;outline-offset:2px}
 .directory-checkboxes[hidden]{display:none!important}
 .directory-filter-group .directory-checkboxes:not([hidden]){padding-top:10px}
+
+/* Opções dos filtros em lista simples, com checkbox ao lado do texto */
+.directory-filter-group .directory-checkboxes:not([hidden]){
+ display:flex!important;
+ flex-direction:column;
+ flex-wrap:nowrap;
+ align-items:stretch;
+ gap:0;
+ padding:7px 2px 2px!important;
+ border:0;
+ background:transparent;
+}
+.directory-filter-group .directory-check{
+ display:flex;
+ width:100%;
+ min-height:38px;
+ align-items:center;
+ justify-content:flex-start;
+ gap:10px;
+ padding:8px 7px;
+ border:0;
+ border-bottom:1px solid rgba(126,203,255,.13);
+ border-radius:0;
+ background:transparent;
+ color:#e9f6ff;
+ font-size:13px;
+ font-weight:550;
+ cursor:pointer;
+ box-shadow:none!important;
+}
+.directory-filter-group .directory-check:last-child{border-bottom:0}
+.directory-filter-group .directory-check:hover{background:rgba(57,166,211,.10)}
+.directory-filter-group .directory-check input{
+ width:17px;
+ height:17px;
+ margin:0;
+ flex:0 0 17px;
+ accent-color:#35c5ed;
+}
+.directory-filter-group .directory-check:has(input:checked){
+ border-color:rgba(126,203,255,.13);
+ background:rgba(31,151,190,.12);
+ color:#a9edff;
+}
 </style></body></html>
