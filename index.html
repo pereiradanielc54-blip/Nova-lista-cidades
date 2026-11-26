@@ -248,9 +248,9 @@ body.apk-webview .field select{
  <button class="directory-toggle" id="directoryToggle" type="button" aria-expanded="false" aria-controls="directoryPanel"><span class="directory-toggle-icon" aria-hidden="true">⌕</span><span><strong>Acesso rápido</strong><small>Encontre uma cidade na lista completa</small></span><span class="directory-toggle-chevron" aria-hidden="true">⌄</span></button><div class="directory-panel hidden" id="directoryPanel"><div class="directory-heading"><div><div class="directory-eyebrow">CONSULTA RÁPIDA</div><h2>Explorar cidades atendidas</h2><p>Veja as cidades cadastradas e filtre por estado ou filial.</p></div><span class="directory-count" id="directoryCount">Carregando…</span></div>
  <div class="directory-filters">
   <label class="directory-search-filter">Buscar cidade<input id="directorySearch" type="search" placeholder="Digite parte do nome…"></label>
-  <div class="directory-filter-group"><strong>Estado</strong><div class="directory-checkboxes" id="directoryUfOptions"></div></div>
-  <div class="directory-filter-group"><strong>Filial</strong><div class="directory-checkboxes" id="directoryBranchOptions"></div></div>
-  <div class="directory-filter-group"><strong>Redespacho</strong><div class="directory-checkboxes" id="directoryRedespachoOptions"><label class="directory-check"><input type="checkbox" value="sim"><span>Sim</span></label><label class="directory-check"><input type="checkbox" value="nao"><span>Não</span></label></div></div>
+  <div class="directory-filter-group"><button type="button" class="directory-filter-toggle" aria-expanded="false" aria-controls="directoryUfOptions"><span>Estado</span><span class="directory-filter-status">Todos</span><span class="directory-filter-chevron">⌄</span></button><div class="directory-checkboxes" id="directoryUfOptions" hidden></div></div>
+  <div class="directory-filter-group"><button type="button" class="directory-filter-toggle" aria-expanded="false" aria-controls="directoryBranchOptions"><span>Filial</span><span class="directory-filter-status">Todas</span><span class="directory-filter-chevron">⌄</span></button><div class="directory-checkboxes" id="directoryBranchOptions" hidden></div></div>
+  <div class="directory-filter-group"><button type="button" class="directory-filter-toggle" aria-expanded="false" aria-controls="directoryRedespachoOptions"><span>Redespacho</span><span class="directory-filter-status">Todos</span><span class="directory-filter-chevron">⌄</span></button><div class="directory-checkboxes" id="directoryRedespachoOptions" hidden><label class="directory-check"><input type="checkbox" value="sim"><span>Sim</span></label><label class="directory-check"><input type="checkbox" value="nao"><span>Não</span></label></div></div>
   <p class="directory-filter-hint">Você pode marcar várias opções em cada filtro. Sem marcar nenhuma opção, todas serão exibidas.</p>
  </div>
  <div class="directory-toolbar"><button type="button" class="directory-export" id="directoryExport">↓ Exportar resultados para Excel</button><span class="directory-export-hint">Exporta todas as cidades encontradas pelos filtros.</span></div>
@@ -980,10 +980,31 @@ main{padding-top:20px;padding-bottom:56px}
   const branches=records.slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).map(item=>({value:item.name,label:item.name}));
   renderCheckboxes(branchOptions,branches,oldBranch);
  }
- const onFilterChange=()=>drawDirectory();
+ const filterGroups=[
+  {container:ufOptions,button:ufOptions.parentElement.querySelector('.directory-filter-toggle'),all:'Todos',one:'selecionado',many:'selecionados'},
+  {container:branchOptions,button:branchOptions.parentElement.querySelector('.directory-filter-toggle'),all:'Todas',one:'selecionada',many:'selecionadas'},
+  {container:redespachoOptions,button:redespachoOptions.parentElement.querySelector('.directory-filter-toggle'),all:'Todos',one:'selecionado',many:'selecionados'}
+ ];
+ filterGroups.forEach(group=>{
+  group.button.addEventListener('click',()=>{
+   const opening=group.container.hidden;
+   group.container.hidden=!opening;
+   group.button.setAttribute('aria-expanded',String(opening));
+   group.button.querySelector('.directory-filter-chevron').textContent=opening?'⌃':'⌄';
+  });
+ });
+ function updateFilterStatus(){
+  filterGroups.forEach(group=>{
+   const selected=selectedValues(group.container),status=group.button.querySelector('.directory-filter-status');
+   status.textContent=selected.length?selected.length+' '+(selected.length===1?group.one:group.many):group.all;
+   group.button.classList.toggle('has-selection',selected.length>0);
+  });
+ }
+ const onFilterChange=()=>{updateFilterStatus();drawDirectory()};
  ufOptions.addEventListener('change',onFilterChange);
  branchOptions.addEventListener('change',onFilterChange);
  redespachoOptions.addEventListener('change',onFilterChange);
+ updateFilterStatus();
  function drawDirectory(){
   const q=norm(search.value),states=selectedValues(ufOptions),branches=selectedValues(branchOptions),redespachos=selectedValues(redespachoOptions);
   const data=allCities().filter(item=>(!q||norm(item.city).includes(q))&&(!states.length||states.includes(String(item.uf||'').toUpperCase()))&&(!branches.length||branches.includes(item.branch))&&(!redespachos.length||redespachos.includes(item.redespacho)));
@@ -1144,4 +1165,15 @@ body:after{pointer-events:none!important}
 .directory-check:has(input:checked){border-color:#4bcdf1;background:rgba(13,88,116,.52);box-shadow:inset 0 0 0 1px #36bde533}
 .directory-filter-hint{grid-column:1/-1;margin:0;color:#9fb8d0;font-size:11px;line-height:1.45}
 @media(max-width:650px){.directory-filters{grid-template-columns:1fr}.directory-search-filter,.directory-filter-hint{grid-column:1}.directory-filter-group{padding:11px}.directory-checkboxes{gap:6px}}
+
+/* Grupos de filtros recolhíveis */
+.directory-filter-group{padding:8px!important}
+.directory-filter-toggle{display:flex;align-items:center;gap:8px;width:100%;min-height:38px;padding:7px 9px;border:1px solid #365b78;border-radius:9px;background:rgba(13,43,68,.78);color:#e9f6ff;text-align:left;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.directory-filter-toggle>span:first-child{flex:1}
+.directory-filter-status{padding:3px 7px;border-radius:20px;background:rgba(147,177,201,.15);color:#a9c3d9;font-size:10px;font-weight:700;white-space:nowrap}
+.directory-filter-toggle.has-selection .directory-filter-status{background:rgba(22,174,213,.2);color:#72dcf5}
+.directory-filter-chevron{font-size:16px;line-height:1;color:#75cce9}
+.directory-filter-toggle:focus-visible{outline:2px solid #55c8ef;outline-offset:2px}
+.directory-checkboxes[hidden]{display:none!important}
+.directory-filter-group .directory-checkboxes:not([hidden]){padding-top:10px}
 </style></body></html>
